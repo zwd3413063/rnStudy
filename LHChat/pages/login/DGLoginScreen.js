@@ -19,6 +19,7 @@ import LHNetWorking ,{LH_LOGIN_PATH} from '../../config/LHNetWorking';
 import Toast from 'react-native-root-toast';
 
 import AlertView from '../../public/DGAlertView';
+import HUD from '../../public/DGHUD';
 
 var SQLite = require('react-native-sqlite-storage')
 
@@ -101,6 +102,12 @@ export default class DGLoginScreen extends Component{
         SQLite.openDatabase({name: 'my.db', location: 'default'});
     };
 
+    //切换登录方式
+    codeLoginChangeAction = ()=>{
+        console.log('切换登录');
+        this.hud.show({message:'这是一个HUD消息'});
+    }
+
     // 点击登录
     loginAction = ()=>{
         if(this.state.account.length == 0){
@@ -171,7 +178,9 @@ export default class DGLoginScreen extends Component{
                               titleFont  = {17}
                               onPress = {this.loginAction}/>
                 </Animated.View>
-                <Text style = {styles.codeText}>验证码登录</Text>
+                <TouchableOpacity style = {{flex:1,flexBasis:40,height:40,flexGrow:0}} onPress = {this.codeLoginChangeAction}>
+                    <Text style = {styles.codeText}>验证码登录</Text>
+                </TouchableOpacity>
 
                 {/* 协议查看 */}
                 <View id =' bottomView' style = {styles.bottomView}>
@@ -186,6 +195,8 @@ export default class DGLoginScreen extends Component{
                         </View>
                     </TouchableHighlight>
                 </View>
+
+                <HUD ref ={(ref)=>(this.hud = ref)}></HUD>
             </View>
         </TouchableOpacity>
         );
@@ -221,7 +232,7 @@ const styles = StyleSheet.create(
             justifyContent:'center',
             textAlign:'center',
             color:g_color.mainColor,
-            fontSize:17
+            fontSize:17,
         },
 
         bottomView:{
