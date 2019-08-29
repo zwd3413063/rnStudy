@@ -20,7 +20,6 @@ import Toast from 'react-native-root-toast';
 
 import AlertView from '../../public/DGAlertView';
 
-
 const Login_accountHeight = 240;    // 账号输入框高度
 
 export default class DGLoginScreen extends Component{
