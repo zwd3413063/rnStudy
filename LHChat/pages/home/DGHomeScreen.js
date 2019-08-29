@@ -17,7 +17,6 @@ export default class HomeController extends Component{
     componentDidMount() {
         StatusBar.setBarStyle('light-content');
         if(g_device.isAndroid)StatusBar.setBackgroundColor('#6a51ae');    // 只对安卓有效
-        let toast = Toast.show('This is a message', {});
     }
     
     leftOnPress = () =>{

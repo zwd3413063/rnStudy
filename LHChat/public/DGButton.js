@@ -12,37 +12,43 @@ export default class DGButton extends Component{
         }
     }
 
-    componentWillReceiveProps(nextProps,nextContext){
-        this.changeAlignmentType(nextProps.alignmentType);
-    }
+    /**componentWillReceiveProps 将在未来的某个版本中取消。请使用下面的 static getDerivedStateFromProps 替代 */ 
+    // componentWillReceiveProps(nextProps,nextContext){
+    // }
 
-    changeAlignmentType = (alignmentType)=>{
+    static getDerivedStateFromProps(nextProps,prevState){
+        // 更改排序规则
+        let  alignmentType = nextProps.alignmentType;
+        let state = {};
         if(alignmentType === 'center'){
-            this.setState({
+            state = {
                 justifyContent:'center',
                 alignItems:'center'
-            });
+            };
         }else if(alignmentType == 'top'){
-            this.setState({
+            state = {
                 justifyContent:'center',
                 alignItems:'flex-start'
-            });
+            };
         }else if(alignmentType == 'left'){
-            this.setState({
+            state = {
                 justifyContent:'flex-start',
                 alignItems:'center'
-            });
+            };
         }else if(alignmentType == 'bottom'){
-            this.setState({
+            state = {
                 justifyContent:'center',
                 alignItems:'flex-end'
-            });
+            };
         }else if(alignmentType == 'right'){
-            this.setState({
+            state = {
                 justifyContent:'flex-end',
                 alignItems:'center'
-            });
+            };
         }
+
+        //此函数必须有返回值。返回的内容就是你想要修改的state信息
+        return state;
     }
 
     donePress = (event)=>{

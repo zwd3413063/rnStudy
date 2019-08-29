@@ -20,6 +20,8 @@ import Toast from 'react-native-root-toast';
 
 import AlertView from '../../public/DGAlertView';
 
+var SQLite = require('react-native-sqlite-storage')
+
 const Login_accountHeight = 240;    // 账号输入框高度
 
 export default class DGLoginScreen extends Component{
@@ -96,6 +98,7 @@ export default class DGLoginScreen extends Component{
     forgetPasswordAction = ()=>{
         Keyboard.dismiss();
         console.log('忘记密码');
+        SQLite.openDatabase({name: 'my.db', location: 'default'});
     };
 
     // 点击登录
