@@ -104,38 +104,46 @@ export default class DGLoginScreen extends Component{
 
     //切换登录方式
     codeLoginChangeAction = ()=>{
-        console.log('切换登录');
-        this.hud.show({message:'这是一个HUD消息'});
+        this.hud.showText({message:'^_^ !!! 此功能还未开发',options:{after:2000,ableUserTouch:false}});
     }
 
     // 点击登录
     loginAction = ()=>{
         if(this.state.account.length == 0){
-            Toast.show( '请输入账号！',{containerStyle:{bottom:this.state.keyboardHeight + 30}});
+            HUD.showFailed({message:'请输入账号!',options:{after:2000,ableUserTouch:false}});
             return;
         }
         if(this.state.password.length == 0){
-            Toast.show( '请输入密码！',{containerStyle:{bottom:this.state.keyboardHeight + 30}});
+            HUD.showFailed({message:'请输入密码!',options:{after:2000,ableUserTouch:false}});
             return;
         }
         Keyboard.dismiss();
 
-        
+        let hud =  HUD.showActivity({message:'正在登录...'})
+
         let body = {'phone':this.state.account,
                     'password':this.state.password,
                     'type':'1'
                     }
         let net = new LHNetWorking.defaultManager();
+        
         net.post({
             path:LH_LOGIN_PATH,
             body:body,
             successed:(ponse)=>{
                 console.log(ponse);
+                hud.message = '登录成功!';
+                hud.mode = 'succeeded';
+                hud.hidden(2000);
+
                 this.props.navigation.navigate('tabbarModal');
+                
             },
             fail:(error)=>{
                 console.log(error);
-                AlertView.show({title:'提示',message:error.message,actions:['确认']});
+                hud.message = error.message;
+                hud.mode = 'failed';
+                hud.hidden(2000);
             }
         });
 
@@ -178,9 +186,13 @@ export default class DGLoginScreen extends Component{
                               titleFont  = {17}
                               onPress = {this.loginAction}/>
                 </Animated.View>
-                <TouchableOpacity style = {{flex:1,flexBasis:40,height:40,flexGrow:0}} onPress = {this.codeLoginChangeAction}>
+
+                <View id = 'codeBackView' style = {styles.codeBackView}>
+                <TouchableOpacity onPress = {this.codeLoginChangeAction}>
                     <Text style = {styles.codeText}>验证码登录</Text>
                 </TouchableOpacity>
+                </View>
+
 
                 {/* 协议查看 */}
                 <View id =' bottomView' style = {styles.bottomView}>
@@ -196,7 +208,7 @@ export default class DGLoginScreen extends Component{
                     </TouchableHighlight>
                 </View>
 
-                <HUD ref ={(ref)=>(this.hud = ref)}></HUD>
+                <HUD ref = {(ref)=>(this.hud = ref)}></HUD>
             </View>
         </TouchableOpacity>
         );
@@ -224,17 +236,21 @@ const styles = StyleSheet.create(
             borderRadius:5.0,
             backgroundColor:'white'
         },
-
+        codeBackView:{
+            flex:1,
+            flexBasis:50,
+            flexGrow:0,
+            justifyContent:'center',
+            alignItems:'center'
+        },
         codeText:{
             flex:1,
-            marginTop:20,
-            alignItems:'center',
-            justifyContent:'center',
+            margin:10,
+            padding:5,
             textAlign:'center',
             color:g_color.mainColor,
             fontSize:17,
         },
-
         bottomView:{
             position: 'absolute',
             flexDirection:'column',

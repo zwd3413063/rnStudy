@@ -64,7 +64,7 @@ export default class DGNavigationBar extends PureComponent{
 
     render(){
         return(
-        <View id ='mainView' style ={[this.props.style, styles.mainView]}>
+        <View id ='mainView' style ={[styles.mainView]}>
        
             <DGButton id = 'leftView' style ={[styles.leftView,{marginLeft: this.state.leftMarginLeft}]} 
                       tintColor = {this.props.tintColor}

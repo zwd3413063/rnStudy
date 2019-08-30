@@ -30,5 +30,5 @@ global.g_color ={
 }
 
 global.user ={
-    autoLogin:false
+    autoLogin:true
 }

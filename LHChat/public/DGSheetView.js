@@ -19,9 +19,6 @@ export default class DGSheetView  extends Component{
     constructor(props){
         super(props);
 
-        // 指定单利
-        _sheetObject = this;
-
         // 点击事件
         this.onPress = ()=>{
         };
@@ -175,7 +172,7 @@ AppRegistry.registerComponent = (appkey,component)=>{
                 return(
                     <View style ={{flex:1,position:'relative'}}>
                         <OriginAppComponent></OriginAppComponent>
-                        <DGSheetView></DGSheetView>
+                        <DGSheetView ref = {(ref)=>(_sheetObject =ref)}></DGSheetView>
                     </View>
                 );
             };

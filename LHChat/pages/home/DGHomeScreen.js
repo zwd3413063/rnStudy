@@ -6,6 +6,9 @@ import Toast from 'react-native-root-toast'
 import DGNavigationBar from '../../public/DGNavigationBar'
 import DGGlobal from '../../config/DGGlobal';
 import DGSheetView from '../../public/DGSheetView';
+import DGAlertView from '../../public/DGAlertView';
+
+import LHView from '../../public/LHView';
 
 export default class HomeController extends Component{
     constructor(props){
@@ -41,7 +44,11 @@ export default class HomeController extends Component{
 
     //HUD
     showHUD = ()=>{
-    let toast = Toast.show('This is a message', {});
+         DGAlertView.show({
+            title:'提示',
+            message:'直接通过AppRegistry，将DGAlertView 预装在根组件在。无需在每个screen中添加<DGAlertView/>',
+            actions:['确认'],
+        });
     };
 
     // 直接显示sheetView
@@ -66,7 +73,15 @@ export default class HomeController extends Component{
     
     render(){
         return(
-        <View style = {styles.mainView}>
+        <LHView style = {styles.mainView}
+            title = '首页'  
+            leftImage = 'address_icon' 
+            leftTitle = '长沙'  
+            rightTitle = '查看全部'
+            leftOnPress ={this.leftOnPress}
+            rightOnPress = {this.rightOnPress}
+            tintColor = '#FFFFFF'>
+
             <KeyboardAwareScrollView style ={{flex:1,flexDirection:'column',paddingTop:100}}>
               <Button onPress = {this.showHUD} title = '显示HUD'></Button>
               <Button onPress = {this.showSheetView} title = '组件通过refs显示SheetView'></Button>
@@ -79,19 +94,9 @@ export default class HomeController extends Component{
                 
             </KeyboardAwareScrollView>
 
-            <DGSheetView ref = {(com)=>(this.sheetView = com)} />
+            <DGSheetView ref = {(ref)=>(this.sheetView = ref)} />
 
-        <DGNavigationBar title = '首页'  
-            leftImage = 'address_icon' 
-            leftTitle = '长沙'  
-            rightTitle = '查看全部'
-            style = {{backgroundColor:"#E10B68"}}
-            leftOnPress ={this.leftOnPress}
-            rightOnPress = {this.rightOnPress}
-            tintColor = '#FFFFFF'
-        />
-
-        </View>
+        </LHView>
         );
     }
 
@@ -103,7 +108,7 @@ const styles = StyleSheet.create(
             flex:1,
             flexDirection:'column',
             justifyContent:'center',
-            alignItems:'stretch'
+            alignItems:'stretch',
         },
         flatList:{
             flex:1,

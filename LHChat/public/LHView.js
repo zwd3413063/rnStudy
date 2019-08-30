@@ -10,16 +10,12 @@ export default class LHView extends Component{
 
     render(){
         return(
-            <View style ={[this.props.style,{flex:1,justifyContent:'center',alignItems:'center'}]}>
+            <View style ={[{flex:1,justifyContent:'center',alignItems:'center'},this.props.style]}>
 
             {/* his.props.children ，拿到所有的子节点。如果此处不写。将无法在使用LHView时显示它的子View组件*/}
             {this.props.children} 
 
-            <DGNavigationBar title = '标题' 
-                                      rightOnPress = {this.rightOnPress}
-                                      tintColor = '#FFFFFF'
-                                      navigation = {this.props.navigation}
-                                      />
+            <DGNavigationBar {...this.props}/>
             </View>
         );
     };

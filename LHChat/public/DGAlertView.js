@@ -22,8 +22,6 @@ export default class DGAlertView extends Component{
 
         // 点击对应按钮事件
         this.onPress = null;
-
-        _dgAlertObject = this;
     }
 
     static show =({title ='',message = '',actions = [],options = null,onPress =null})=>{
@@ -180,7 +178,7 @@ AppRegistry.registerComponent = (appkey,component)=>{
                 return(
                     <View style ={{flex:1,position:'relative'}}>
                         <OriginAppComponent></OriginAppComponent>
-                        <DGAlertView></DGAlertView>
+                        <DGAlertView ref = {ref =>(_dgAlertObject = ref)}></DGAlertView>
                     </View>
                 );
             };
