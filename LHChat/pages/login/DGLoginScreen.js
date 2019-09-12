@@ -126,7 +126,6 @@ export default class DGLoginScreen extends Component{
                     'type':'1'
                     }
         let net = new LHNetWorking.defaultManager();
-        
         net.post({
             path:LH_LOGIN_PATH,
             body:body,
