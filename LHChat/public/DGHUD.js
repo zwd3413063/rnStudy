@@ -232,7 +232,6 @@ const styles = StyleSheet.create({
         alignItems:'center',
         flexGrow:0,
         //  添加阴影(貌似暂时只支持iOS)
-        elevation: 20,// 安卓的属性
         shadowOffset:{width: 0, height: 3},
         shadowColor:'black',
         shadowOpacity: 0.8,

@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import {Text,View,FlatList,TouchableHighlight,Platform,StyleSheet,SafeAreaView,StatusBar,Button,TextInput,Dimensions} from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import Toast from 'react-native-root-toast'
 
 import DGNavigationBar from '../../public/DGNavigationBar'
 import DGGlobal from '../../config/DGGlobal';
 import DGSheetView from '../../public/DGSheetView';
 import DGAlertView from '../../public/DGAlertView';
+import HUD from '../../public/DGHUD';
 
 import LHView from '../../public/LHView';
 
@@ -44,11 +44,7 @@ export default class HomeController extends Component{
 
     //HUD
     showHUD = ()=>{
-         DGAlertView.show({
-            title:'提示',
-            message:'直接通过AppRegistry，将DGAlertView 预装在根组件在。无需在每个screen中添加<DGAlertView/>',
-            actions:['确认'],
-        });
+        HUD.showActivity({message:'这个问题你要去问问我的小伙伴们。他们是如何处理的'});
     };
 
     // 直接显示sheetView

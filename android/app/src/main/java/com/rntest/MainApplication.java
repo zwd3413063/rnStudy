@@ -29,8 +29,9 @@ public class MainApplication extends Application implements ReactApplication {
         无法自动加载安装包的。可以通过下面方式手动加载,eg:
         packages.add(new MyReactNativePackage());
        */
-       packages.add(new SQLitePluginPackage()); // register SQLite Plugin here
-      return packages;
+      // 加了会报错，不要了
+      //  packages.add(new SQLitePluginPackage()); // register SQLite Plugin here
+       return packages;
     }
 
     @Override
