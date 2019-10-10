@@ -42,13 +42,13 @@ export default class DGLoginScreen extends Component{
          * 添加键盘事件
          * 安卓设备 keyboardWillShow 与 keyboardWillHide 无效。所以只能使用 keyboardDidShow 与 keyboardDidHide 来代替来。但是效果可能不太好！
         */
-        if(g_device.isAndroid){
+        // if(g_device.isAndroid){
             this.keyboardShowLister = Keyboard.addListener('keyboardDidShow',this.keyboardWillShow);
             this.keyboardHiddenLister = Keyboard.addListener('keyboardDidHide',this.keyboardWillHidden);
-        }else{
-            this.keyboardShowLister = Keyboard.addListener('keyboardWillShow',this.keyboardWillShow);
-            this.keyboardHiddenLister = Keyboard.addListener('keyboardWillHide',this.keyboardWillHidden);
-        }
+        // }else{
+        //     this.keyboardShowLister = Keyboard.addListener('keyboardWillShow',this.keyboardWillShow);
+        //     this.keyboardHiddenLister = Keyboard.addListener('keyboardWillHide',this.keyboardWillHidden);
+        // }
     }
 
     // 组件加载完毕
