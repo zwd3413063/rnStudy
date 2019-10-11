@@ -20,7 +20,6 @@ import Toast from 'react-native-root-toast';
 
 import AlertView from '../../public/DGAlertView';
 import HUD from '../../public/DGHUD';
-
 var SQLite = require('react-native-sqlite-storage')
 
 const Login_accountHeight = 240;    // 账号输入框高度
@@ -42,19 +41,19 @@ export default class DGLoginScreen extends Component{
          * 添加键盘事件
          * 安卓设备 keyboardWillShow 与 keyboardWillHide 无效。所以只能使用 keyboardDidShow 与 keyboardDidHide 来代替来。但是效果可能不太好！
         */
-        // if(g_device.isAndroid){
+        if(g_device.isAndroid){
             this.keyboardShowLister = Keyboard.addListener('keyboardDidShow',this.keyboardWillShow);
             this.keyboardHiddenLister = Keyboard.addListener('keyboardDidHide',this.keyboardWillHidden);
-        // }else{
-        //     this.keyboardShowLister = Keyboard.addListener('keyboardWillShow',this.keyboardWillShow);
-        //     this.keyboardHiddenLister = Keyboard.addListener('keyboardWillHide',this.keyboardWillHidden);
-        // }
+        }else{
+            this.keyboardShowLister = Keyboard.addListener('keyboardWillShow',this.keyboardWillShow);
+            this.keyboardHiddenLister = Keyboard.addListener('keyboardWillHide',this.keyboardWillHidden);
+        }
     }
 
     // 组件加载完毕
     componentDidMount() {
-        StatusBar.setBarStyle('dark-content');
-        if(g_device.isAndroid)StatusBar.setBackgroundColor('#6a51ae');    // 只对安卓有效
+        StatusBar.setBarStyle('default');
+        if(g_device.isAndroid)StatusBar.setBackgroundColor('#FFFFFF');    // 只对安卓有效
     }
 
     // 路由处理
@@ -70,6 +69,7 @@ export default class DGLoginScreen extends Component{
     
     // 键盘将要弹出
     keyboardWillShow = (event)=>{
+        console.log(event);
         let keybodyOffset = event.endCoordinates;
         let duration = event.duration;
         let accountTop = keybodyOffset.screenY - Login_accountHeight - 20;// 20 为键盘与视图的间歇
@@ -90,7 +90,10 @@ export default class DGLoginScreen extends Component{
 
     // 键盘将要隐藏
     keyboardWillHidden = (event)=>{
-        let duration = event.duration;
+        console.log(event);
+        let duration = 0;   // 键盘动画持续时间，安卓在键盘消失时event == null
+        if(event) duration = event.duration;
+        
         this.setState({keyboardHeight:0});
 
         //改变state 。添加了动画效果
@@ -162,7 +165,7 @@ export default class DGLoginScreen extends Component{
             <View style = {styles.mainView} >
                 {/* icon */}
                 <Image style = {[styles.image,{left:this.state.iconLeft,top:this.state.iconTop}]}
-                       source = {{uri:'Sign_in_logo_img'}} 
+                       source = {{uri:'sign_in_logo_img'}} 
                 />
                 {/* 账号密码输入 */}
                 <Animated.View id = 'contentView' style = {[styles.contentView,{marginTop:this.state.accountViewTop}]}>
@@ -317,7 +320,7 @@ const contentStyle = StyleSheet.create({
         borderRadius:22,
         backgroundColor:g_color.mainColor,
         //  添加阴影(貌似暂时只支持iOS)
-        elevation: 20,// 安卓的属性
+        // elevation: 20,// 安卓的属性
         shadowOffset:{width: 0, height: 3},
         shadowColor: g_color.mainColor,
         shadowOpacity: 0.8,

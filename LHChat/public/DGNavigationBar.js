@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import {View,Text,TouchableHighlight,StyleSheet} from 'react-native';
+import {View,Text,StyleSheet,StatusBar} from 'react-native';
 import DGButton from '../public/DGButton';
 import Global from '../config/DGGlobal';
 import NavigationService  from '../config/NavigationService';
@@ -18,14 +18,18 @@ export default class DGNavigationBar extends PureComponent{
      
      // 组件加载完毕
      componentDidMount(){
-        if(!this.props.navigation)return;
+        // 设置状态栏颜色
+        StatusBar.setBarStyle('light-content');
+        if(g_device.isAndroid)StatusBar.setBackgroundColor('#E10B68');    // 只对安卓有效
 
+        if(!this.props.navigation)return;
+        // 获取父组件，判断索引是否为0来控制是否需要渲染返回按钮
         const parent = this.props.navigation.dangerouslyGetParent();
         this.setState(paramsState =>({index:parent.state.index}));
         
         if(parent.state.index > 0){
             this.setState(paramsState =>{
-                return {leftImage: '导航返回', leftTitle: null,leftAlignmentType:'left',leftMarginLeft:10};
+                return {leftImage: 'navigation_goback', leftTitle: null,leftAlignmentType:'left',leftMarginLeft:10};
             });
         }else{
             this.setState(paramsState =>{

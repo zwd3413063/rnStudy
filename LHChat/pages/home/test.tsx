@@ -8,18 +8,6 @@ interface Props {
   onDec?: () => void;
 }
 
-// export default ({ name, count = 1, onInc, onDec }: Props) => (
-//     <View style={styles.root}>
-//       <Text>
-//         Counter {name}: {count}
-//       </Text>
-//       <View>
-//         <Button title="+" onPress={onInc || (() => {})} />
-//         <Button title="-" onPress={onDec || (() => {})} />
-//       </View>
-//     </View>
-//   );
-
 export default class test extends Comment{
     name = '';
     count = 0;

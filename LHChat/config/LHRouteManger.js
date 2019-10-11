@@ -107,9 +107,9 @@ const getTabBarIcon =(navigation,focused,tintColor)=>{
     let {routeName} = navigation.state;
     let imgName;
     if (routeName === 'home'){
-      imgName = focused? 'home_light_icon':'home_icon';
+      imgName = focused? 'home_light_icon':'home_gray_icon';
     }else if(routeName === 'myself'){
-      imgName = focused? 'my_light_icon':'my_icon';
+      imgName = focused? 'my_light_icon':'my_gray_icon';
     }
     let tabbarIndexAction =()=>{
       navigation.navigate('Home');
