@@ -56,7 +56,11 @@ export default class DGNavigationBar extends PureComponent{
             );
     
         }else if(props.contentView){
-            return props.contentView;
+            return (
+                <View id = 'contentView' style = {[styles.contentView,{marginLeft:10,marginRight:10,flexDirection:'column',alignItems:'stretch'}]}>
+                    {props.contentView}
+                </View>
+            );
     
         }else{
             return(
@@ -114,6 +118,7 @@ const styles = StyleSheet.create(
             height:44.0,
         },
         contentView:{
+            flex:1,
             flexGrow:1,
             height:44.0,
             alignItems:'center',

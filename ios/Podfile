@@ -29,6 +29,10 @@ target 'rnTest' do
 
 
   # 数据库sqlite操作
+  pod 'react-native-sqlite-storage', :path => '../node_modules/react-native-sqlite-storage'
+
+  # 定位
+  pod 'react-native-location', :path => '../node_modules/react-native-location/react-native-location.podspec'
 
   target 'rnTestTests' do
     inherit! :search_paths

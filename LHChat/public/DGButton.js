@@ -9,6 +9,8 @@ export default class DGButton extends Component{
         this.state = {
             justifyContent:'center',
             alignItems:'center',
+            arrangeType:'imageInFront',
+            direction:'row'
         }
     }
 
@@ -19,7 +21,9 @@ export default class DGButton extends Component{
     static getDerivedStateFromProps(nextProps,prevState){
         // 更改排序规则
         let  alignmentType = nextProps.alignmentType;
+        let  arrangeType = nextProps.arrangeType;
         let state = {};
+
         if(alignmentType === 'center'){
             state = {
                 justifyContent:'center',
@@ -47,6 +51,13 @@ export default class DGButton extends Component{
             };
         }
 
+        state.arrangeType =  arrangeType? arrangeType:'imageInFront';
+
+        if(state.arrangeType == 'imageInFront')state.direction    = 'row';
+        if(state.arrangeType == 'imageInback')state.direction     = 'row-reverse';
+        if(state.arrangeType == 'imageInTop')state.direction      = 'column';
+        if(state.arrangeType == 'imageInBottom')state.direction   = 'column-reverse';
+
         //此函数必须有返回值。返回的内容就是你想要修改的state信息
         return state;
     }
@@ -64,7 +75,7 @@ export default class DGButton extends Component{
                               activeOpacity = {0.45}
                               >
 
-              <View style = {[styles.mainView,{justifyContent:this.state.justifyContent,alignItems:this.state.alignItems}]}>
+              <View style = {[styles.mainView,{justifyContent:this.state.justifyContent,alignItems:this.state.alignItems,flexDirection:this.state.direction}]}>
                 <Image  style = {[styles.image,{tintColor:this.props.tintColor,width:this.props.img?20:0,height:this.props.img?20:0,flexBasis:this.props.img?20:0}]}
                         source = {{uri:this.props.img}} 
                         resizeMode = 'contain' ></Image>

@@ -17,6 +17,8 @@ import DGButton from '../../public/DGButton';
 import DGGlobal from '../../config/DGGlobal';
 import LHNetWorking ,{LH_LOGIN_PATH} from '../../config/LHNetWorking';
 import Toast from 'react-native-root-toast';
+import Storage from '../../config/storage/DGAsyncStorage';
+
 
 import AlertView from '../../public/DGAlertView';
 import HUD from '../../public/DGHUD';
@@ -145,7 +147,9 @@ export default class DGLoginScreen extends Component{
                 hud.message = '登录成功!';
                 hud.mode = 'succeeded';
                 hud.hidden(2000);
-
+                // 保存数据
+                Storage.
+                // 进入首页
                 this.props.navigation.navigate('tabbarModal');
                 
             },
