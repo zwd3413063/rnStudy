@@ -10,6 +10,7 @@ import DGHomeScreen from '../pages/home/DGHomeScreen';
 import LHMyselfScreen from "../pages/myself/LHMySelfScreen";
 import DGCitySelectScreen from '../pages/citySelect/LHCitySelectScreen';
 import LHUserInfoScreen from '../pages/myself/LHUserInfoScreen';
+import Storage,{login_response_info} from '../config/storage/DGAsyncStorage';
 
 // 各个导航控制器
 const loginStack = createStackNavigator(
@@ -73,35 +74,6 @@ const tabbarStack = createBottomTabNavigator(
     }
 )
 
-// 创建根screen
-const RootStack = createStackNavigator(
-    {
-      Main: {screen: loginStack},
-      tabbarModal: { screen: tabbarStack},
-    },
-    {
-      mode: 'modal',
-      headerMode: 'none',
-      initialRouteName : global.user.autoLogin? 'tabbarModal':'Main',
-      defaultNavigationOptions:({navigation})=>(
-          {gesturesEnabled:false} // 禁止手势滑动退出，这里的模态居然在iOS中也可以压入
-      )
-    }
-);
-
-
-const LoginController =  createAppContainer(RootStack);
-
-export default class LoginRootScreen extends Component{
-    render(){
-        return(
-           <LoginController  
-           ref={navigatorRef => { NavigationService.setTopLevelNavigator(navigatorRef);}}
-          />
-        );
-    }
-}
-
 // 定义tabbar图片
 const getTabBarIcon =(navigation,focused,tintColor)=>{
     let {routeName} = navigation.state;
@@ -117,5 +89,73 @@ const getTabBarIcon =(navigation,focused,tintColor)=>{
 
    return <Image style ={{height:20,width:20}} source = {{uri:imgName}}></Image>;
 }
+
+
+// 等待的视图
+export class LoadingScreen extends Component{
+    render (){
+        return (
+        <View style = {{flex:1,backgroundColor:'green'}}>
+        </View>
+        );
+    }
+} 
+
+
+export default class LoginRootScreen extends Component{
+    constructor(){
+        super();
+        this.state = {
+            initialRouteName :'load'
+        }
+    }
+
+    componentDidMount(){
+        // 判断登录状态
+        Storage.fetch({key:login_response_info},(data,error)=>{
+           if(data)this.setState((state)=>({initialRouteName:'tabbarModal'}));
+           else  this.setState((state)=>({initialRouteName:'Main'}));
+        });
+    }
+    
+    didLoadInitialRoute = (initialRouteName)=>{
+        if(initialRouteName == 'load'){
+            return( 
+                <View style = {{flex:1,backgroundColor:'green'}}>
+                </View>
+            );
+        }
+
+        // 创建根screen
+        const RootStack = createStackNavigator(
+                {
+                    Main: {screen: loginStack},
+                    tabbarModal: { screen: tabbarStack},
+                },
+            {
+                mode: 'modal',
+                headerMode: 'none',
+                initialRouteName : initialRouteName,
+                defaultNavigationOptions:({navigation})=>(
+                    {gesturesEnabled:false} // 禁止手势滑动退出，这里的模态居然在iOS中也可以压入
+                )
+            }
+        );
+        let LoginController =  createAppContainer(RootStack);
+
+        return (
+            <LoginController  
+            ref={navigatorRef => { NavigationService.setTopLevelNavigator(navigatorRef);}}
+           />
+        );
+
+    }
+    
+    render(){
+        // 指定视图
+       return this.didLoadInitialRoute(this.state.initialRouteName);
+    }
+}
+
 
 

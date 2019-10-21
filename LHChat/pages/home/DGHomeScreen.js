@@ -88,23 +88,16 @@ export default class HomeController extends Component{
                    }
 
         let net = new LHNetWorking.defaultManager();
-        net.post({
+        net.get({
             path:LH_HOME_USER_LIST,
             body:body,
             successed:(ponse)=>{
                 console.log(ponse);
-                hud.message = '登录成功!';
-                hud.mode = 'succeeded';
-                hud.hidden(2000);
-
                 this.props.navigation.navigate('tabbarModal');
                 
             },
             fail:(error)=>{
                 console.log(error);
-                hud.message = error.message;
-                hud.mode = 'failed';
-                hud.hidden(2000);
             }
         });
     }

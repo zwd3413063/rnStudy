@@ -16,8 +16,11 @@ import {
 import DGButton from '../../public/DGButton';
 import DGGlobal from '../../config/DGGlobal';
 import LHNetWorking ,{LH_LOGIN_PATH} from '../../config/LHNetWorking';
-import Toast from 'react-native-root-toast';
-import Storage from '../../config/storage/DGAsyncStorage';
+
+import Storage,{
+    local_user_key,
+    login_response_info
+} from '../../config/storage/DGAsyncStorage';
 
 
 import AlertView from '../../public/DGAlertView';
@@ -25,6 +28,7 @@ import HUD from '../../public/DGHUD';
 var SQLite = require('react-native-sqlite-storage')
 
 const Login_accountHeight = 240;    // 账号输入框高度
+
 
 export default class DGLoginScreen extends Component{
     constructor(props){
@@ -56,6 +60,18 @@ export default class DGLoginScreen extends Component{
     componentDidMount() {
         StatusBar.setBarStyle('default');
         if(g_device.isAndroid)StatusBar.setBackgroundColor('#FFFFFF');    // 只对安卓有效
+
+        // 获取本地登录记录
+        Storage.fetch({key:local_user_key}, 
+            (data,error)=>{
+                if(data){
+                    this.setState({
+                        account:data.phone,
+                        password:data.password
+                    });
+                }
+            }
+        );
     }
 
     // 路由处理
@@ -148,7 +164,9 @@ export default class DGLoginScreen extends Component{
                 hud.mode = 'succeeded';
                 hud.hidden(2000);
                 // 保存数据
-                Storage.
+                Storage.save({key:local_user_key,data:body});// 保存登录得账号与密码
+                if(ponse)Storage.save({key:login_response_info,data:ponse.data,timeOut:3600*24*30});
+
                 // 进入首页
                 this.props.navigation.navigate('tabbarModal');
                 

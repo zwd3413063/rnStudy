@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         alignItems:'center',
         flexGrow:0,
-        //  添加阴影(貌似暂时只支持iOS)
+        //  添加阴影(貌似暂时只支持iOS)，这个报错。不晓得为啥
         shadowOffset:{width: 0, height: 3},
         shadowColor:'black',
         shadowOpacity: 0.8,

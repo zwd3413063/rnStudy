@@ -1,6 +1,8 @@
 
 import { AsyncStorage } from "react-native";
-import LogManager from '../public/LHLoginOutManager'
+import LogManager from '../public/LHLoginOutManager';
+import Storage,{login_response_info} from '../config/storage/DGAsyncStorage';
+
 
 const lh_base_url = 'http://fox.frpgz1.idcfengye.com/';
 
@@ -9,6 +11,8 @@ const lh_header = {
     'Content-Type': 'application/x-www-form-urlencoded',    //表单提交方式。常用的还有 'application/json'
     'Token':'NoToken'
 };
+
+let lh_token = 'NoToken';  // 登录token
 
 const lh_body = {
     'version':'1.0.0'
@@ -29,10 +33,10 @@ const LHNetWorkingCode = {
     dataNull        : 2,        // 数据为空
     serverFail      : -10,      // 请求报错
     tokenInvalidate : -1,       // token失效
-    systemBusy      : -3,       //系统繁忙
+    systemBusy      : -3,       // 系统繁忙
     dataError       : -3000,    // 数据格式错误
-    netError        : 404,      //网络错误
-    codeOther       : 10000,    //其他错误
+    netError        : 404,      // 网络错误
+    codeOther       : 10000,    // 其他错误
 }
 
 
@@ -74,11 +78,25 @@ export default class LHNetWorking{
     }
 
     // 发起请求
-    fetch = (requestPath,header,body,method,successed,fail)=>{
+    fetch = async (requestPath,header,body,method,successed,fail)=>{
+                // 首先得从本地获取token
+
+                if (lh_token == 'NoToken'){
+                    let data = await Storage.asyncFetch({key:login_response_info});
+                    let jsonData = JSON.parse(data);// 字符串转json
+                    lh_token =  jsonData.token;
+                }
+
                 // 拼接请求头
-                header = {...lh_header,...header};
+                header = {...lh_header,...{'Token':lh_token},...header};
                 // 拼接请求体
                 body = {...lh_body,...body};
+
+                // get请求这里不能使用body
+                if(method = 'GET'){
+                    requestPath = requestPath+ this.paramsFromdata(body);
+                    body = '';
+                }
 
                 // 发起请求
                 fetch(requestPath,
@@ -125,6 +143,7 @@ export default class LHNetWorking{
 
     // 数据转换成表单格式的。eg:value=123&value1=321
     paramsFromdata = (body)=>{
+        if(body.length == 0)return '';
         let bodyString = String();
 
         for (const key in body) {
