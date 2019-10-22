@@ -82,9 +82,13 @@ export default class LHNetWorking{
                 // 首先得从本地获取token
 
                 if (lh_token == 'NoToken'){
-                    let data = await Storage.asyncFetch({key:login_response_info});
-                    let jsonData = JSON.parse(data);// 字符串转json
-                    lh_token =  jsonData.token;
+                    try{
+                        let data = await Storage.asyncFetch({key:login_response_info});
+                        let jsonData = JSON.parse(data);// 字符串转json
+                        if(jsonData)lh_token =  jsonData.token;
+                    }catch(e){
+                        lh_token = 'NoToken';
+                    }
                 }
 
                 // 拼接请求头
@@ -93,8 +97,8 @@ export default class LHNetWorking{
                 body = {...lh_body,...body};
 
                 // get请求这里不能使用body
-                if(method = 'GET'){
-                    requestPath = requestPath+ this.paramsFromdata(body);
+                if(method === 'GET'){
+                    requestPath = requestPath + "?" + this.paramsFromdata(body);
                     body = '';
                 }
 

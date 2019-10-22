@@ -16,7 +16,6 @@
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
     "react-native-location": "^2.5.0",
     "react-native-reanimated": "^1.2.0",
-    "react-native-root-toast": "^3.1.2",
     "react-native-sqlite-storage": "^4.1.0",
     "react-native-storage": "^1.0.1",
     "react-navigation": "^3.12.1",
