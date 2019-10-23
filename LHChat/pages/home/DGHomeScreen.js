@@ -15,6 +15,7 @@ import LoadingView from '../../public/DGLoadingView';
 import DGButton from '../../public/DGButton';
 import RNLocation from 'react-native-location'; // 定位功能
 import LocationManager from '../../config/DGLocation';
+import HomeItem from './DGHomeItem';
 
 import LHNetWorking ,{LH_HOME_USER_LIST} from '../../config/LHNetWorking';
 
@@ -23,18 +24,13 @@ export default class HomeController extends Component{
     constructor(props){
         super(props);
         this.state = {
-            loadType:'start'
+            datas:[]
         }
         // 加载视图
         this.loadingView = null;
     }
 
     componentDidMount() {
-        if(this.loadingView)this.loadingView.loadType = 'start';
-        setTimeout(()=>{
-            if(this.loadingView)this.loadingView.loadType = 'failed';
-        },3000);
-
         // 默认加载数据
         this.defaultFetch();
     }
@@ -57,16 +53,19 @@ export default class HomeController extends Component{
                    }
 
         let net = new LHNetWorking.defaultManager();
+
+        if(this.loadingView)this.loadingView.loadType = 'start';
         net.get({
             path:LH_HOME_USER_LIST,
             body:body,
             successed:(ponse)=>{
                 console.log(ponse);
-                this.props.navigation.navigate('tabbarModal');
-                
+                this.setState(state =>({datas:ponse.data}));
+                if(this.loadingView)this.loadingView.loadType = 'stoped';
             },
             fail:(error)=>{
                 console.log(error);
+                if(this.loadingView)this.loadingView.loadType = 'failed';
             }
         });
     }
@@ -76,13 +75,10 @@ export default class HomeController extends Component{
     againLoadAction = ()=>{
         // 默认加载数据
         this.defaultFetch();
-        
-        if(!this.loadingView.isLoading){
-            if(this.loadingView)this.loadingView.loadType = 'start';
-            setTimeout(()=>{
-                if(this.loadingView)this.loadingView.loadType = 'stoped';
-            },3000);
-        }
+    }
+
+    onPressItem = (item)=>{
+        console.log(item);
     }
 
     /*-------create View------*/
@@ -93,17 +89,22 @@ export default class HomeController extends Component{
                    title = '搜索你喜欢的用户/职业'
                    tintColor = '#D685A0'
                    titleFont = {12}>
-
          </DGButton>
         );
     }
 
+
     render(){
         return (
             <View style ={{flex:1}}>
-                    <FlatList style = {{flex:1}}>
+                    <FlatList style = {{flex:1,marginTop:g_screen.topHeight}}
+                              data = {this.state.datas}
+                              renderItem = {(item) =>(<HomeItem itemData = {item} onPress = {this.onPressItem}></HomeItem>)}
+                              keyExtractor = {(item,index)=>(String(item.userId))}
+                              
 
-                    </FlatList>
+                    />
+                        
 
                     <LoadingView  ref = {(ref) => (this.loadingView = ref)} onPress = {this.againLoadAction}></LoadingView>
             

@@ -164,8 +164,8 @@ export default class DGLoginScreen extends Component{
                 hud.mode = 'succeeded';
                 hud.hidden(2000);
                 // 保存数据
-                Storage.save({key:local_user_key,data:body});// 保存登录得账号与密码
-                if(ponse)Storage.save({key:login_response_info,data:ponse.data,timeOut:3600*24*30});
+                Storage.save({key:local_user_key,data:body});// 保存登录的账号与密码
+                if(ponse)Storage.save({key:login_response_info,data:ponse.data,timeOut:3600*24*30});//保存token信息，有效期一个月
 
                 // 进入首页
                 this.props.navigation.navigate('tabbarModal');

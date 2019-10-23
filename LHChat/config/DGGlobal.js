@@ -15,6 +15,9 @@ const g_unify_top_height = isAndroid? 44:64;
 const g_tabbarHeight = (isIPhoneX || isIPhoneXS || isIPhoneXS_Max || isIPhoneXR)? 83:49;
 const g_topbarHeight = (isIPhoneX || isIPhoneXS || isIPhoneXS_Max || isIPhoneXR)? 88:g_unify_top_height;
 
+const lh_image_base_url = "http://foxcommunity.oss-cn-beijing.aliyuncs.com";
+export {lh_image_base_url};
+
 global.g_screen = {
     width:width,
     height:height,
