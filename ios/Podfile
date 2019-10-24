@@ -33,6 +33,9 @@ target 'rnTest' do
 
   # 定位
   pod 'react-native-location', :path => '../node_modules/react-native-location/react-native-location.podspec'
+  
+  # RAC 绘图
+  pod 'React-ART', :path => '../node_modules/react-native/Libraries/ART'
 
   target 'rnTestTests' do
     inherit! :search_paths
