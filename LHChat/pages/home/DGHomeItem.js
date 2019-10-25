@@ -63,7 +63,7 @@ export default class DGHomeItem extends Component{
 
     render(){
         return(
-        <TouchableOpacity onPress = {this._onPress}>
+        <TouchableOpacity onPress = {this._onPress} activeOpacity = {0.5}>
             <View style = {styles.mainView}>
                 {/* 左边头像 */}
                 <View id = 'leftView' style = {styles.leftView}>

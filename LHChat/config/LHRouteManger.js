@@ -11,6 +11,7 @@ import LHMyselfScreen from "../pages/myself/LHMySelfScreen";
 import DGCitySelectScreen from '../pages/citySelect/LHCitySelectScreen';
 import LHUserInfoScreen from '../pages/myself/LHUserInfoScreen';
 import Storage,{login_response_info} from '../config/storage/DGAsyncStorage';
+import DGHomeDetailScreen from '../pages/home/DGHomeDetailScreen';
 
 // 各个导航控制器
 const loginStack = createStackNavigator(
@@ -23,10 +24,12 @@ const loginStack = createStackNavigator(
     }
 );
 
+// 首页
 const homeStack = createStackNavigator(
     {
-        root :DGHomeScreen,
-        selectCity : DGCitySelectScreen
+        root        : DGHomeScreen,
+        selectCity  : DGCitySelectScreen,
+        homeDetail  : DGHomeDetailScreen
     },
     {
         initialRouteName:'root',
@@ -38,7 +41,7 @@ const homeStack = createStackNavigator(
     }
 );
  
-    //个人中心
+//个人中心
 const MyselfStack = createStackNavigator(
     {
         root :LHMyselfScreen,
@@ -63,7 +66,10 @@ const tabbarStack = createBottomTabNavigator(
     {
         defaultNavigationOptions:({navigation})=>({
             tabBarIcon:({focused,tintColor})=>{
-              return getTabBarIcon(navigation,focused,tintColor);
+                return getTabBarIcon(navigation,focused,tintColor);
+            },
+            tabBarLabel:({focused,tintColor})=>{
+                return getTabbarTitle(navigation,focused,tintColor);
             }
         }),
         tabBarOptions: {
@@ -83,13 +89,24 @@ const getTabBarIcon =(navigation,focused,tintColor)=>{
     }else if(routeName === 'myself'){
       imgName = focused? 'my_light_icon':'my_gray_icon';
     }
-    let tabbarIndexAction =()=>{
-      navigation.navigate('Home');
-    };
 
    return <Image style ={{height:20,width:20}} source = {{uri:imgName}}></Image>;
 }
 
+// 定义tabbar标签
+const getTabbarTitle = (navigation,focused,tintColor) =>{
+    let {routeName} = navigation.state;
+    let title = '';
+    let color = tintColor;
+    if(routeName == 'home')title = '首页';
+    else if (routeName == 'myself') title = '我的';
+
+    if(!focused)color = '#999999';
+    
+    return (
+        <Text style ={{color:color,fontSize:11,paddingBottom:5}}>{title}</Text>
+    )
+}
 
 // 等待的视图
 export class LoadingScreen extends Component{
@@ -100,7 +117,6 @@ export class LoadingScreen extends Component{
         );
     }
 } 
-
 
 export default class LoginRootScreen extends Component{
     constructor(){

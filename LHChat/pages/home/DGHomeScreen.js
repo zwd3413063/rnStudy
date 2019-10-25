@@ -6,8 +6,6 @@ import {
     StyleSheet,
 }  from 'react-native';
 
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
 import DGNavigationBar from '../../public/DGNavigationBar'
 import DGGlobal from '../../config/DGGlobal';
 import LHView from '../../public/LHView';
@@ -113,7 +111,7 @@ export default class HomeController extends Component{
     }
 
     onPressItem = (item)=>{
-        console.log(item);
+        this.props.navigation.navigate('homeDetail',item);
     }
 
     /*-------create View------*/
