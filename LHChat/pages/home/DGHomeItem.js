@@ -40,7 +40,7 @@ export default class DGHomeItem extends Component{
     
     // 距离、上次登录时间描述
     _userDistance = (item)=>{
-        let des = "";
+        let dis = "";
         if(item.distance < 1000)dis = "距离" + item.distance + "米";
         else dis =  "距离" + parseInt(item.distance/1000)+ "千米";
 
@@ -101,6 +101,7 @@ export default class DGHomeItem extends Component{
                            img = "money_icon"
                          title = "付费相册"
                      tintColor = "#FEA925"
+                     titleColor= "#FEA925"
                      titleFont = {10}
                  alignmentType = "right"
                    ></Button>

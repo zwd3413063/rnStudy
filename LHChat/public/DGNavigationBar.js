@@ -72,10 +72,11 @@ export default class DGNavigationBar extends PureComponent{
 
     render(){
         return(
-        <View id ='mainView' style ={[styles.mainView]}>
+        <View id ='mainView' style ={[styles.mainView,{backgroundColor:this.props.backgroundColor? this.props.backgroundColor:"#E10B68"}]}>
        
             <DGButton id = 'leftView' style ={[styles.leftView,{marginLeft: this.state.leftMarginLeft}]} 
                       tintColor = {this.props.tintColor}
+                      titleColor = {this.props.tintColor}
                       title = {this.props.leftTitle? this.props.leftTitle:this.state.leftTitle} 
                       img = {this.props.leftImage? this.props.leftImage:this.state.leftImage}
                       onPress = {this.props.leftOnPress? this.props.leftOnPress:this.leftOnPress}
@@ -87,6 +88,7 @@ export default class DGNavigationBar extends PureComponent{
     
             <DGButton id = 'rightView'
                       tintColor = {this.props.tintColor}
+                      titleColor = {this.props.tintColor}
                       style ={styles.rightView}
                       title = {this.props.rightTitle} 
                       img = {this.props.rightImage}

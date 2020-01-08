@@ -80,7 +80,7 @@ export default class DGButton extends Component{
                         source = {{uri:this.props.img}} 
                         resizeMode = 'contain' ></Image>
 
-                <Text style = {[styles.text,{color:this.props.tintColor ,fontSize:this.props.titleFont}]}> {this.props.title} </Text>
+                <Text style = {[styles.text,{color:this.props.titleColor ,fontSize:this.props.titleFont}]}> {this.props.title} </Text>
               </View>
             </TouchableOpacity>
         );
@@ -106,7 +106,8 @@ const styles = StyleSheet.create(
         text:{
             color:'#999999',
             textAlign:'center',
-            fontSize:13
+            fontSize:13,
+            padding:2
         },
         image:{
             height:20.0,

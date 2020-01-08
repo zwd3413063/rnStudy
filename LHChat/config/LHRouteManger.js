@@ -160,9 +160,8 @@ export default class LoginRootScreen extends Component{
         let LoginController =  createAppContainer(RootStack);
 
         return (
-            <LoginController  
-            ref={navigatorRef => { NavigationService.setTopLevelNavigator(navigatorRef);}}
-           />
+            <LoginController   ref={navigatorRef => { NavigationService.setTopLevelNavigator(navigatorRef);}}
+             />
         );
 
     }

@@ -120,7 +120,7 @@ export default class HomeController extends Component{
         return (
          <DGButton style = {{flex:1,flexGrow:1,backgroundColor:'rgba(0,0,0,0.1)',marginTop:7,marginBottom:7,borderRadius: 15}} 
                    title = '搜索你喜欢的用户/职业'
-                   tintColor = '#D685A0'
+                   titleColor = '#D685A0'
                    titleFont = {12}>
          </DGButton>
         );
@@ -139,8 +139,8 @@ export default class HomeController extends Component{
                               ref = {(ref) =>{this.refreshList = ref}}
                     />
                         
-                    <LoadingView  ref = {(ref) => (this.loadingView = ref)} onPress = {this.againLoadAction}></LoadingView>
-            
+                <LoadingView  ref = {(ref) => (this.loadingView = ref)} onPress = {this.againLoadAction}></LoadingView>
+
                 <DGNavigationBar title = {this.state.title} 
                                  tintColor   = '#FFFFFF'
                                  navigation  = {this.props.navigation}

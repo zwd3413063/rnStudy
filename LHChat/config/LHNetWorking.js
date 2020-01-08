@@ -21,10 +21,11 @@ const lh_body = {
 // 接口API
 const LH_LOGIN_PATH = '/api/user/login';                    // 登录
 const LH_HOME_USER_LIST = '/api/user/getUserList';          // 获取首页用户列表
-
+const LH_FETCH_USER_INFO  = "/api/user/getUserDate";        // 获取用户信息
 export {
     LH_LOGIN_PATH,
-    LH_HOME_USER_LIST
+    LH_HOME_USER_LIST,
+    LH_FETCH_USER_INFO
 };
 
 // 接口回调状态码
