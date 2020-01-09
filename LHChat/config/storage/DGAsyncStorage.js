@@ -33,7 +33,7 @@ export default class DGStorage {
     // 保存数据
    static save = ({key,data,timeOut})=>{
        let expires = timeOut? 1000*timeOut:null;
-        storage.save({
+       return storage.save({
             key: key,  // 注意:请不要在key中使用_下划线符号!
             data: data,
             // 如果不指定过期时间，则会使用defaultExpires参数

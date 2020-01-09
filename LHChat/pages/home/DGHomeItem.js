@@ -41,7 +41,8 @@ export default class DGHomeItem extends Component{
     // 距离、上次登录时间描述
     _userDistance = (item)=>{
         let dis = "";
-        if(item.distance < 1000)dis = "距离" + item.distance + "米";
+        if(!item.distance)dis = "距离≤100米"
+        else if(item.distance < 1000)dis = "距离" + item.distance + "米";
         else dis =  "距离" + parseInt(item.distance/1000)+ "千米";
 
         if(item.updateTime >0){

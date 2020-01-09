@@ -160,16 +160,23 @@ export default class DGLoginScreen extends Component{
             body:body,
             successed:(ponse)=>{
                 console.log(ponse);
-                hud.message = '登录成功!';
-                hud.mode = 'succeeded';
-                hud.hidden(2000);
-                // 保存数据
-                Storage.save({key:local_user_key,data:body});// 保存登录的账号与密码
-                if(ponse)Storage.save({key:login_response_info,data:ponse.data,timeOut:3600*24*30});//保存token信息，有效期一个月
 
-                // 进入首页
-                this.props.navigation.navigate('tabbarModal');
-                
+                // 保存登录的账号与密码
+                Storage.save({key:local_user_key,data:body});
+                //保存token信息，有效期一个月
+                if(ponse)Storage.save({key:login_response_info,data:ponse.data,timeOut:3600*24*30})
+                .then((post)=>{
+                    hud.message = '登录成功!';
+                    hud.mode = 'succeeded';
+                    hud.hidden(2000);
+                    // 进入首页
+                   this.props.navigation.navigate('tabbarModal');
+                }).catch((error)=>{
+                    console.log(error);
+                    hud.message = error;
+                    hud.mode = 'failed';
+                    hud.hidden(2000);
+                });
             },
             fail:(error)=>{
                 console.log(error);
@@ -206,7 +213,7 @@ export default class DGLoginScreen extends Component{
                     </View>
                     <DGButton id ='forgetPasswordBtn' 
                               style ={contentStyle.forgetPassword} 
-                              tintColor = {g_color.mainColor}
+                              titleColor = {g_color.mainColor}
                               titleFont  = {14} 
                               title = '忘记密码?'
                               onPress = {this.forgetPasswordAction}/>
@@ -214,7 +221,7 @@ export default class DGLoginScreen extends Component{
                     <DGButton id = 'loginBtn' 
                               style = {contentStyle.login} 
                               title = '登录' 
-                              tintColor = '#FFFFFF'
+                              titleColor = '#FFFFFF'
                               titleFont  = {17}
                               onPress = {this.loginAction}/>
                 </Animated.View>

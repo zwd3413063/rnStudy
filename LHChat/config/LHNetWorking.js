@@ -4,7 +4,8 @@ import LogManager from '../public/LHLoginOutManager';
 import Storage,{login_response_info} from '../config/storage/DGAsyncStorage';
 
 
-const lh_base_url = 'http://fox.frpgz1.idcfengye.com/';
+// 项目base地址
+const lh_base_url = 'http://www.0792kk.cn/';
 
 const lh_header = {
     'Accept': 'application/json',

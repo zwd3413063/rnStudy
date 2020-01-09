@@ -118,7 +118,7 @@ export default class DGAlertView extends Component{
             } 
 
             let view  = <View key = {i} style ={style} >
-                            <DGButton index ={i} title = {title} tintColor = {color} style ={{flex:1,fontSize:12}} onPress ={this.done}></DGButton>
+                            <DGButton index ={i} title = {title} tintColor = {color} titleColor = {color} style ={{flex:1,fontSize:12}} onPress ={this.done}></DGButton>
                         </View>
             views.push(view);
         }
