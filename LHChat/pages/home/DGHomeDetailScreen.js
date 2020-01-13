@@ -9,10 +9,12 @@ import {
 
 import DGNavigationBar from '../../public/DGNavigationBar';
 import HeaderComponent from './view/DGHomeDetailHeaderScreen';
-import DGButton from '../../public/DGButton';
+import DGButton from 'dg-public/DGButton'; // 使用相对路径只需要在对应的文件下添加一个pageage.json文件，加入{"name":"xxx"}即可
 import DGGlobal from '../../config/DGGlobal';
 import LHNetWorking ,{LH_FETCH_USER_INFO} from '../../config/LHNetWorking';
 import LoadingView from '../../public/DGLoadingView';
+import UserInfo from './model/LHUserInfo';
+import UserPhotosItemScreen from './view/DGUserPhotosItemScreen';
 
 
 export default class DGHomeDetailScreen extends Component{
@@ -51,8 +53,8 @@ export default class DGHomeDetailScreen extends Component{
             path:LH_FETCH_USER_INFO,
             body:body,
             successed:(ponse)=>{
-                console.log(ponse);
-                this.setState((state)=> ({userDetailInfo:ponse.data}));
+                let userModel = new UserInfo(ponse.data);
+                this.setState((state)=> ({userDetailInfo:userModel}));
                 // 刷新加载视图
                 if(this.loadingView)this.loadingView.loadType = 'stoped';
                 if(this.refreshList)this.refreshList.reloadData();
@@ -71,9 +73,11 @@ export default class DGHomeDetailScreen extends Component{
         // 1、相册
         if(section.key == '0'){
             return (
-                <View style={{flex:1, height:104}}>
-                     <Text style = {{color:'red'}}>{item.index}</Text>
-                </View>
+                <UserPhotosItemScreen   style = {{height:100}}
+                                        imageModels = {this.state.userDetailInfo.images}
+                                        showPhoto = {this.state.userDetailInfo.showPhoto}
+                                        photoMoney = {this.state.userDetailInfo.photoMoney}
+                />
             )
         }
 

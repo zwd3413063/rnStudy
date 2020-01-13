@@ -97,7 +97,7 @@ export default class DGHomeItem extends Component{
                 {/* 右边收藏/是否付费 */}
                 <View id = 'rightView' style={styles.rightView}>
                     <Button id = 'payPhoto' 
-                         style = {{height:20,width:70,marginRight:20,display:this.props.itemData.item.showPhoto? "flex":"none"}}
+                         style = {{height:20,width:70,marginRight:20,display:this.props.itemData.item.showPhoto? "none":"flex"}}
                    arrangeType = "imageInFront" 
                            img = "money_icon"
                          title = "付费相册"
