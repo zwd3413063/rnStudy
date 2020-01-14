@@ -114,6 +114,10 @@ export default class HomeController extends Component{
         this.props.navigation.navigate('homeDetail',item);
     }
 
+    leftOnPress = ()=>{
+        this.props.navigation.navigate('selectCity');
+    }
+
     /*-------create View------*/
     // 顶部搜索视图
     createTopCenterView = ()=>{
@@ -148,6 +152,7 @@ export default class HomeController extends Component{
                                  rightTitle  = '查看全部'
                                  leftTitle   = '长沙'
                                  leftImage   = 'address_icon'
+                                 leftOnPress = {this.leftOnPress}
                                       />
             </View>
         );

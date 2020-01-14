@@ -1,5 +1,9 @@
 import React ,{Component} from "react"; 
-import { createStackNavigator, createBottomTabNavigator ,createAppContainer } from "react-navigation";
+
+import {createStackNavigator} from "react-navigation-stack";
+import {createBottomTabNavigator} from "react-navigation-tabs";
+import {createAppContainer} from "react-navigation";
+
 import { Text, View ,Image} from 'react-native';
 
 import NavigationService from './NavigationService';
@@ -33,14 +37,14 @@ const homeStack = createStackNavigator(
     },
     {
         initialRouteName:'root',
-        headerMode: 'none',         // 隐藏导航栏
-        navigationOptions:({navigation}) =>(
-            // 是否显示 tabar 。 只有index 为0时显示。表示为跟视图
-            {tabBarVisible:navigation.state.index === 0} // 隐藏标签栏
-        )
+        headerMode: 'none',         
+        navigationOptions:({navigation}) =>({
+            // 是否显示 tabar 。 只有index 为0时显示。表示为根视图
+            tabBarVisible :navigation.state.index === 0, // 隐藏标签栏
+        }),
     }
 );
- 
+
 //个人中心
 const MyselfStack = createStackNavigator(
     {
@@ -153,7 +157,7 @@ export default class LoginRootScreen extends Component{
                 headerMode: 'none',
                 initialRouteName : initialRouteName,
                 defaultNavigationOptions:({navigation})=>(
-                    {gesturesEnabled:false} // 禁止手势滑动退出，这里的模态居然在iOS中也可以压入
+                    {gestureEnabled:false} // 禁止手势滑动退出，这里的模态居然在iOS中也可以压入
                 )
             }
         );

@@ -73,8 +73,8 @@ export default class DGHomeDetailScreen extends Component{
         // 1、相册
         if(section.key == '0'){
             return (
-                <UserPhotosItemScreen   style = {{height:100}}
-                                        imageModels = {this.state.userDetailInfo.images}
+                <UserPhotosItemScreen   style = {{height:105}}
+                                        imageModels = {this.state.userDetailInfo.imageModels}
                                         showPhoto = {this.state.userDetailInfo.showPhoto}
                                         photoMoney = {this.state.userDetailInfo.photoMoney}
                 />
@@ -84,7 +84,7 @@ export default class DGHomeDetailScreen extends Component{
         // 2、个人介绍
         if(section.key == '1'){
             return(
-                <View style ={{flex:1,paddingTop:8,paddingBottom:8,backgroundColor:"#FFFFFF"}}>
+                <View style ={{flex:1,paddingTop:8,paddingBottom:8,backgroundColor:"#FFFFFF",borderBottomWidth:0.5,borderBottomColor:'#DCDCDC'}}>
                     <Text style ={{color:'#999999',fontSize:12,marginLeft:20,marginRight:20,marginBottom:10}}>
                         简介:<Text style ={{color:'#333333',fontSize:12}}>{this.state.userDetailInfo.introduction}</Text>
                     </Text>

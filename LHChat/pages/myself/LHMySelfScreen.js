@@ -13,12 +13,6 @@ export default class LHMyselfScreen extends Component{
             title:'个人中心'
         };
     }
-
-    // 路由处理
-    static navigationOptions = {
-        header:null,    // 单个页面隐藏导航栏
-    };
-
     loginAction = ()=>{
         DGSheetView.show({
             title:'选择',

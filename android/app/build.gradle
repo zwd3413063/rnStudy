@@ -194,6 +194,10 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
     // implementation project(':react-native-sqlite-storage') // 引入SQLite库需要添加此代码
 
+    // 下面两行代码为react-native natigator 4.0 所需要添加的东西。很苦恼！！每次更新就要改一大堆。它还天天更新
+    implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
+
     if (enableHermes) {
       def hermesPath = "../../node_modules/hermesvm/android/";
       debugImplementation files(hermesPath + "hermes-debug.aar")

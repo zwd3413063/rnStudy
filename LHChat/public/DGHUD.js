@@ -28,11 +28,6 @@ export default class DGHUD extends Component{
 
         this.timer = null;
     }
-
-    componentWillUnmount(){
-      if(this.timer)clearTimeout(this.timer);
-    }
-
     get mode(){
         return this.state.mode;
     };

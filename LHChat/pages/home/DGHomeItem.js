@@ -129,6 +129,7 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         alignItems:'stretch',
         height:80,
+        backgroundColor:'#FFFFFF'
     },
 
     // 左边视图

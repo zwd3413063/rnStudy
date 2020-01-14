@@ -23,8 +23,10 @@ export default class PhotosItemScreen extends Component{
     // 渲染每一行
     _renderItem = (item, index, separators)=>{
         return (
-            <View style ={[styles.renderItem,{width:this.props.style.height-20}]}>
-                <Image style = {{backgroundColor:'#FFC1E5',position:'absolute',left:0,top:0,right:0,height:this.props.style.height-20}}/>
+            <View style ={[styles.renderItem,{width:this.props.style.height-10}]}>
+                <Image style = {{backgroundColor:'#FFC1E5',position:'absolute',left:0,top:0,right:0,height:this.props.style.height-10}}
+                       source ={{uri:item.uri}}
+                    />
             </View>
         )
     }
@@ -53,13 +55,14 @@ export default class PhotosItemScreen extends Component{
 
         // 显示相册
         return(
-            <View style={[this.props.style,{flex:1}]}>
+            <View style={[this.props.style,{flex:1,backgroundColor:'#FFFFFF',borderBottomWidth:0.5,borderBottomColor:'#DCDCDC'}]}>
                 <FlatList  style        = {{flex:1}} 
-                contentContainerStyle   = {{alignItems:'stretch'}}
+                contentContainerStyle   = {{alignItems:'stretch',padding:5}}
                            horizontal   = {true}
                            data         = {this.props.imageModels}
                            renderItem   = {({item, index, separators})=>(this._renderItem(item, index, separators))}
                            keyExtractor = {(item,index)=>(index.toString())}
+                           showsHorizontalScrollIndicator = {false}
                 />
             </View>
         )
@@ -72,6 +75,6 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         alignItems:'center',
         backgroundColor:'red',
-        margin:10
+        margin:2
     }
 });

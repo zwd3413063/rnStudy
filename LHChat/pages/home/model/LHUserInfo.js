@@ -1,3 +1,5 @@
+import {lh_image_base_url} from 'dg-config/DGGlobal'
+
 export default class LHUserInfo{
     /*
 NSString * ID;                // 用户ID
@@ -66,6 +68,23 @@ qualityCornerImage;           // 用户质量角标图
     */
     constructor(data){
         //原型复制，将data的属性全部赋值给this
-        Object.setPrototypeOf(this, data);
+        // Object.setPrototypeOf(this, data);  找个不行。会改变this的指向
+        let propertys = Object.getOwnPropertyNames(data);
+        // 这里是for of 不是 for in 看清楚了。for of其实才是和oc中的for in功能相同
+        for (const name of propertys) {
+            this[name] = data[name];
+        }
+    }
+
+    // 相册数组
+    get imageModels(){
+        let imageModels = [];
+        if (!this.images)return imageModels;
+        
+        for (const imageObject of this.images){
+                imageObject.uri = lh_image_base_url + imageObject.files.filePath;
+                imageModels.push(imageObject);
+        }
+        return imageModels;
     }
 }
