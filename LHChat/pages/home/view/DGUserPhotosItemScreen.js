@@ -6,6 +6,7 @@ import {
     FlatList,
     StyleSheet,
     Image,
+    TouchableOpacity
 }  from 'react-native';
 
 import DGButton from 'dg-public/DGButton';
@@ -20,14 +21,21 @@ export default class PhotosItemScreen extends Component{
         super();
     }
 
+    //action点击事件
+    onPress = (item,index)=>{
+        if(this.props.onPress) this.props.onPress(item,index);
+    }
+
     // 渲染每一行
     _renderItem = (item, index, separators)=>{
         return (
-            <View style ={[styles.renderItem,{width:this.props.style.height-10}]}>
-                <Image style = {{backgroundColor:'#FFC1E5',position:'absolute',left:0,top:0,right:0,height:this.props.style.height-10}}
-                       source ={{uri:item.uri}}
-                    />
-            </View>
+            <TouchableOpacity onPress = {()=>(this.onPress(item,index))}>
+                <View style ={[styles.renderItem,{width:this.props.style.height-10}]}>
+                    <Image  style = {{backgroundColor:'#FFC1E5',position:'absolute',left:0,top:0,right:0,height:this.props.style.height-10}}
+                            source ={{uri:item.uri}}
+                        />
+                </View>
+            </TouchableOpacity>
         )
     }
 

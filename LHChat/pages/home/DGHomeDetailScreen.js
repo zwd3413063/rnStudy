@@ -7,15 +7,14 @@ import {
     StyleSheet,
 }  from 'react-native';
 
-import DGNavigationBar from '../../public/DGNavigationBar';
+import DGNavigationBar from 'dg-public/DGNavigationBar';
 import HeaderComponent from './view/DGHomeDetailHeaderScreen';
 import DGButton from 'dg-public/DGButton'; // 使用相对路径只需要在对应的文件下添加一个pageage.json文件，加入{"name":"xxx"}即可
-import DGGlobal from '../../config/DGGlobal';
-import LHNetWorking ,{LH_FETCH_USER_INFO} from '../../config/LHNetWorking';
-import LoadingView from '../../public/DGLoadingView';
+import LHNetWorking ,{LH_FETCH_USER_INFO} from 'dg-config/LHNetWorking';
+import LoadingView from 'dg-public/DGLoadingView';
 import UserInfo from './model/LHUserInfo';
 import UserPhotosItemScreen from './view/DGUserPhotosItemScreen';
-
+import CheckImageView from 'dg-public/DGCheckImageView';
 
 export default class DGHomeDetailScreen extends Component{
     constructor(){
@@ -23,6 +22,7 @@ export default class DGHomeDetailScreen extends Component{
         this.state = {
             title:'用户详情',
             userDetailInfo:{},
+            checkImage:false,
             section:[{title:'相册',key:'0',data:['']},
                      {title:'个人资料',key:'1',data:['']},
                      {title:'其他',key:'2',data:['约会节目','约会条件','QQ','微信']}]
@@ -68,15 +68,21 @@ export default class DGHomeDetailScreen extends Component{
         });
     }
 
+    // action 事件
+    checkImageOnpress = (item,index)=>{
+        this.setState((state)=>({checkImage:true}));
+    }
+
     // 每一行的内容
     _renderItem = (item,index,section)=>{
         // 1、相册
         if(section.key == '0'){
             return (
-                <UserPhotosItemScreen   style = {{height:105}}
+                <UserPhotosItemScreen   style       = {{height:105}}
                                         imageModels = {this.state.userDetailInfo.imageModels}
-                                        showPhoto = {this.state.userDetailInfo.showPhoto}
-                                        photoMoney = {this.state.userDetailInfo.photoMoney}
+                                        showPhoto   = {this.state.userDetailInfo.showPhoto}
+                                        photoMoney  = {this.state.userDetailInfo.photoMoney}
+                                        onPress     = {this.checkImageOnpress}
                 />
             )
         }
@@ -194,6 +200,11 @@ export default class DGHomeDetailScreen extends Component{
                                 tintColor       = '#FFFFFF'
                                 navigation      = {this.props.navigation}
                                 backgroundColor = 'rgba(0,0,0,0)'
+                />
+
+                {/* 大图全屏查看 */}
+                <CheckImageView visible     = {this.state.checkImage}
+                                imageModels = {this.state.userDetailInfo.imageModels}
                 />
             </View>
         )
