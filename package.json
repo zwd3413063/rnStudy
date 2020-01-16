@@ -15,6 +15,7 @@
     "react": "16.8.6",
     "react-native": "0.60.5",
     "react-native-gesture-handler": "^1.4.1",
+    "react-native-image-pan-zoom": "^2.1.11",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
     "react-native-location": "^2.5.0",
     "react-native-reanimated": "^1.2.0",

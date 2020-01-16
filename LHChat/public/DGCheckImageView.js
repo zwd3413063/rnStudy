@@ -5,11 +5,12 @@ import {
     StyleSheet,
     Modal,
     Image,
-    ScrollView
+    ScrollView,
+    Dimensions
 }  from 'react-native';
 
-import DGNavigationBar from 'dg-public/DGNavigationBar'
-
+import DGNavigationBar from 'dg-public/DGNavigationBar';
+import ImageZoom from 'react-native-image-pan-zoom';
 /*
 imageModels 
 imageURLs
@@ -23,10 +24,15 @@ export default class DGCheckImageView extends Component{
         }
     }
 
-    componentDidMount(){
-       if(this.props.imageModels)this.setState((state)=>({title:'1/'+this.props.imageModels.length}));
+    static getDerivedStateFromProps(nextProps,prevState){
+        let state = {};
+        if(nextProps.imageModels){
+            let index = 0;
+            if(nextProps.currentIndex)index = nextProps.currentIndex;
+            state.title = (index+1) +'/' + nextProps.imageModels.length;
+        }
+        return state
     }
-
     _data = ()=>{
         if(this.props.imageModels)return this.props.imageModels;
         if(this.props.imageURLs)return this.props.imageURLs;
@@ -60,18 +66,24 @@ export default class DGCheckImageView extends Component{
 }
 
 // item 数据
-class DGCheckImageItem extends PureComponent{
+class DGCheckImageItem extends Component{
     constructor(){
         super();
 
         this.state = {
             imageWidth:g_screen.width,
             imageHeight:g_screen.width,
-            imageTop:0
+            imageTop:0,
+            imageLeft:0,
         }
     }
-    shouldComponentUpdate(nextProps, nextState) {
-       
+
+    componentDidMount(){
+        this._imageFrame(this.props.item);
+    }
+
+    static getDerivedStateFromProps(nextProps,prevState){
+        return {};
     }
 
     // 计算图片的高度
@@ -79,21 +91,53 @@ class DGCheckImageItem extends PureComponent{
         Image.getSize(item.uri,
             // 成功的回调
             (width,height)=>{
+                let ratio   = parseFloat(height)/parseFloat(width);
 
+                let imageWidth   = g_screen.width;
+                let imageHeight  = g_screen.width*ratio;
+                let imageLeft    = 0;
+                let imageTop     = 0;
+
+                if(imageHeight <=g_screen.height){
+                    imageWidth= g_screen.width;
+                    imageLeft = 0;
+                    imageTop  = (g_screen.height - imageHeight)/2.0;
+                }else{
+                    imageHeight= g_screen.height;
+                    imageWidth = g_screen.height/ratio;
+                    imageLeft  = (g_screen.width - imageWidth)/2.0;
+                    imageTop   = 0;
+                }
+                this.setState((state)=>({imageWidth,imageHeight,imageLeft,imageTop}));
             },
             // 失败的回调
             (error)=>{
-
-            },
-            );
+                let imageWidth  = g_screen.width;
+                let imageHeight = g_screen.width;
+                let imageLeft   = 0;
+                let imageTop    = (g_screen.height - g_screen.width)/2.0;
+                this.setState((state)=>({imageWidth,imageHeight,imageLeft,imageTop}));
+            }
+        );
     }
 
     render(){
         return(
             <View style = {styles.imageItem}>
-                <ScrollView style ={{flex:1,backgroundColor:'red'}}>
-                    <Image source = {{uri:this.props.item.uri}} style = {{width:g_screen.width,height:300}}></Image>
-                </ScrollView>
+                {/* <ScrollView cropWidth={Dimensions.get('window').width}
+                       cropHeight={Dimensions.get('window').height}
+                       imageWidth={this.state.imageWidth}
+                       imageHeight={this.state.imageHeight}>
+                        <Image style={{height:this.state.imageHeight,width:this.state.imageWidth}}
+                                source={{uri:this.props.item.uri}}/>
+                </ScrollView> */}
+                <ImageZoom  cropWidth={Dimensions.get('window').width}
+                            cropHeight={Dimensions.get('window').height}
+                            imageWidth={this.state.imageHeight}
+                            imageHeight={this.state.imageHeight}>
+                    <Image source = {{uri:this.props.item.uri}} 
+                            style = {{position: 'absolute',left:this.props.imageLeft,top:this.props.imageTop,height:this.state.imageHeight,width:this.state.imageWidth,backgroundColor:'#696969'}}></Image>
+                </ImageZoom>
             </View>
         )
     }
@@ -105,5 +149,8 @@ const styles = StyleSheet.create({
         height:g_screen.height,
         width:g_screen.width,
         flexBasis:g_screen.width
+    },
+    itemImage:{
+    
     }
 });

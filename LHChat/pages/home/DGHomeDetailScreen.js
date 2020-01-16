@@ -23,6 +23,7 @@ export default class DGHomeDetailScreen extends Component{
             title:'用户详情',
             userDetailInfo:{},
             checkImage:false,
+            checkImageIndex:0,
             section:[{title:'相册',key:'0',data:['']},
                      {title:'个人资料',key:'1',data:['']},
                      {title:'其他',key:'2',data:['约会节目','约会条件','QQ','微信']}]
@@ -70,7 +71,7 @@ export default class DGHomeDetailScreen extends Component{
 
     // action 事件
     checkImageOnpress = (item,index)=>{
-        this.setState((state)=>({checkImage:true}));
+        this.setState((state)=>({checkImage:true,checkImageIndex:index}));
     }
 
     // 每一行的内容
@@ -205,6 +206,7 @@ export default class DGHomeDetailScreen extends Component{
                 {/* 大图全屏查看 */}
                 <CheckImageView visible     = {this.state.checkImage}
                                 imageModels = {this.state.userDetailInfo.imageModels}
+                                currentIndex= {this.state.checkImageIndex}
                 />
             </View>
         )
