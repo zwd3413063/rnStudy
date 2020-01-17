@@ -74,6 +74,16 @@ export default class DGHomeDetailScreen extends Component{
         this.setState((state)=>({checkImage:true,checkImageIndex:index}));
     }
 
+    // 关闭 大图查看
+    _dismissChekImage = ()=>{
+        this.setState((state)=>({checkImage:false}));
+    }
+
+    // 切换查看的图片
+    _changeCurrentIndex = (index)=>{
+        this.setState((state)=>({checkImageIndex:index}));
+    }
+
     // 每一行的内容
     _renderItem = (item,index,section)=>{
         // 1、相册
@@ -158,6 +168,8 @@ export default class DGHomeDetailScreen extends Component{
     }
 
   
+
+  
     render(){
         return(
             <View id = 'mainView' style = {style.main}>
@@ -207,6 +219,9 @@ export default class DGHomeDetailScreen extends Component{
                 <CheckImageView visible     = {this.state.checkImage}
                                 imageModels = {this.state.userDetailInfo.imageModels}
                                 currentIndex= {this.state.checkImageIndex}
+                                dismiss     = {this._dismissChekImage}
+                                changeCurrentIndex = {this._changeCurrentIndex}
+
                 />
             </View>
         )

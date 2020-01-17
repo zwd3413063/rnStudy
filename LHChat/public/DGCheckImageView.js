@@ -6,7 +6,9 @@ import {
     Modal,
     Image,
     ScrollView,
-    Dimensions
+    Dimensions,
+    PanResponder,
+    TouchableOpacity
 }  from 'react-native';
 
 import DGNavigationBar from 'dg-public/DGNavigationBar';
@@ -18,42 +20,83 @@ imageURLs
 export default class DGCheckImageView extends Component{
     constructor(){
         super();
-
         this.state = {
-            title:'0/0'
+            scrollEnabled:true,
+            maxIndex:0,
         }
+        this.contentOffset ={x:0,y:0};
     }
 
     static getDerivedStateFromProps(nextProps,prevState){
-        let state = {};
-        if(nextProps.imageModels){
-            let index = 0;
-            if(nextProps.currentIndex)index = nextProps.currentIndex;
-            state.title = (index+1) +'/' + nextProps.imageModels.length;
-        }
-        return state
+        let state = {...prevState};
+        if(nextProps.imageModels)   state.maxIndex = nextProps.imageModels.length;
+        return state;
     }
+
     _data = ()=>{
         if(this.props.imageModels)return this.props.imageModels;
         if(this.props.imageURLs)return this.props.imageURLs;
         return [];
     }
 
+    //更新title
+    _updateTitle = (index)=>{
+        return (index+1)+'/'+this.state.maxIndex;
+    }
+
+    // 改变可否滑动状态
+    _scrollEnabledClick = (able)=>{
+        let intValue = 0;
+        if(this.contentOffset){ intValue = this.contentOffset.x/Dimensions.get('window').width;}
+        if(intValue%1==0){
+            if(this.state.scrollEnabled != able){
+                this.setState((state)=>({scrollEnabled : able}));
+            }
+        }
+    }
+
+    // 恢复滑动
+    _recoverMove = (able) =>{
+        this.setState((state)=>({scrollEnabled : able}));
+    }
+
+    // 滑动停止
+    _onScrollEndDrag = (event)=>{
+        this.contentOffset = event.nativeEvent.contentOffset;
+        let currentIndex = parseInt(this.contentOffset.x/Dimensions.get('window').width);
+        if(this.props.changeCurrentIndex)this.props.changeCurrentIndex(currentIndex);
+    }
+
+    // 关闭
+    _dismiss =()=>{
+        if(this.props.dismiss)this.props.dismiss();
+    }
+
     render(){
         return (
-            <Modal visible = {this.props.visible? this.props.visible:false}>
+            <Modal visible = {this.props.visible}>
                 <View style ={{flex:1,backgroundColor:'#000000'}}>
                     <FlatList
                         data            = {this._data()}
-                        renderItem      = {({item})=>(<DGCheckImageItem item = {item}></DGCheckImageItem>)}
+                        renderItem      = {({item})=>(<DGCheckImageItem item = {item} 
+                                                                        changeSuperAbleMove = {this._scrollEnabledClick} 
+                                                                        recoverMove = {this._recoverMove}
+                                                                        onPress = {this._dismiss}
+                                                                        />)}
+
                         keyExtractor    = {(item,index) =>(index.toString())}
                         horizontal      = {true}
                         showsHorizontalScrollIndicator = {false}
                         pagingEnabled   = {true}
+                        scrollEnabled   = {this.state.scrollEnabled}
+                        ref             = {(ref)=>(this._flatlist = ref)}
+                        onScrollEndDrag = {this._onScrollEndDrag}
+                        contentOffset   = {{x:this.props.currentIndex*Dimensions.get('window').width,y:0}}
+                        onMomentumScrollEnd = {this._onScrollEndDrag}
                     />
 
                     <DGNavigationBar    backgroundColor = {'rgba(0,0,0,0.1)'}
-                                        title = {this.state.title} 
+                                        title = {this._updateTitle(this.props.currentIndex)} 
                                         tintColor   = '#FFFFFF'
                                         titleColor  = '#FFFFFF'
                                         leftOnPress = {this.leftOnPress}
@@ -76,6 +119,9 @@ class DGCheckImageItem extends Component{
             imageTop:0,
             imageLeft:0,
         }
+
+        // 父类scrollView是否可以滑动
+        this.superAbleMove = true;
     }
 
     componentDidMount(){
@@ -120,23 +166,57 @@ class DGCheckImageItem extends Component{
             }
         );
     }
+      // 单击
+      _onPress =()=>{
+          if(this.props.onPress)this.props.onPress();
+      }
+
+      // 长按
+      _onLongPress = ()=>{
+          console.log('长按');
+      }
+
+      // 放手
+      _responderRelease = ()=>{
+          if(this.props.recoverMove)this.props.recoverMove(this.superAbleMove);
+      }
+
+      // 移动
+      _onMove = (position)=>{
+          if(position.scale <= 1){
+            this.superAbleMove = true;
+            if(this.props.changeSuperAbleMove)this.props.changeSuperAbleMove(this.superAbleMove);
+          }else{
+            // 公式:  边界值 = ((图片宽度*放大比例)/2 - 屏幕宽度/2)/放大比例。取绝对值
+            let boundValue = ((this.state.imageWidth*position.scale)/2 - Dimensions.get('window').width/2)/position.scale;
+             /** 划出边界恢复scrollView的滑动功能
+              * -4 是在快要超过时就可以滑动下一页了*/ 
+            if(Math.abs(position.positionX)>=boundValue){
+                this.superAbleMove = true;
+                if(this.props.changeSuperAbleMove)this.props.changeSuperAbleMove(this.superAbleMove);
+            }else{
+                this.superAbleMove = false;
+                if(this.props.changeSuperAbleMove)this.props.changeSuperAbleMove(this.superAbleMove);
+            }
+          }
+      }
 
     render(){
         return(
             <View style = {styles.imageItem}>
-                {/* <ScrollView cropWidth={Dimensions.get('window').width}
-                       cropHeight={Dimensions.get('window').height}
-                       imageWidth={this.state.imageWidth}
-                       imageHeight={this.state.imageHeight}>
-                        <Image style={{height:this.state.imageHeight,width:this.state.imageWidth}}
-                                source={{uri:this.props.item.uri}}/>
-                </ScrollView> */}
                 <ImageZoom  cropWidth={Dimensions.get('window').width}
                             cropHeight={Dimensions.get('window').height}
-                            imageWidth={this.state.imageHeight}
-                            imageHeight={this.state.imageHeight}>
+                            imageWidth={Dimensions.get('window').width}
+                            imageHeight={this.state.imageHeight}
+                            onClick = {this._onPress}
+                            onLongPress = {this._onLongPress}
+                            horizontalOuterRangeOffset = {this._horizontalOuterRangeOffset}
+                            onMove = {this._onMove}
+                            responderRelease = {this._responderRelease}
+                            >
                     <Image source = {{uri:this.props.item.uri}} 
-                            style = {{position: 'absolute',left:this.props.imageLeft,top:this.props.imageTop,height:this.state.imageHeight,width:this.state.imageWidth,backgroundColor:'#696969'}}></Image>
+                            style = {{position: 'absolute',left:this.props.imageLeft,top:this.props.imageTop,height:this.state.imageHeight,width:this.state.imageWidth,backgroundColor:'#696969'}}
+                            />
                 </ImageZoom>
             </View>
         )
