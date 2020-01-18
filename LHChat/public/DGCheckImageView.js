@@ -21,8 +21,10 @@ export default class DGCheckImageView extends Component{
     constructor(){
         super();
         this.state = {
-            scrollEnabled:true,
-            maxIndex:0,
+            scrollEnabled:true, // 是否可以滑动，主要是为了大图查看时，不能让底部的滑动视图响应手势 
+            maxIndex:0,         // 最大图片数量
+            showIndex:0,        // 初始点击的第几张图片
+            isShowed:false      // 此字段为了判断是否为visible 显示或者关闭。只调用一次。不然props和state会冲突。没得办法呀！
         }
         this.contentOffset ={x:0,y:0};
     }
@@ -30,6 +32,13 @@ export default class DGCheckImageView extends Component{
     static getDerivedStateFromProps(nextProps,prevState){
         let state = {...prevState};
         if(nextProps.imageModels)   state.maxIndex = nextProps.imageModels.length;
+        if(nextProps.visible && !state.isShowed){
+            state.isShowed = true;
+            state.showIndex = nextProps.currentIndex;
+
+        }else  if(!nextProps.visible && state.isShowed){
+            state.isShowed = false;
+        }
         return state;
     }
 
@@ -44,7 +53,7 @@ export default class DGCheckImageView extends Component{
         return (index+1)+'/'+this.state.maxIndex;
     }
 
-    // 改变可否滑动状态
+    // 判断可否改变滑动状态
     _scrollEnabledClick = (able)=>{
         let intValue = 0;
         if(this.contentOffset){ intValue = this.contentOffset.x/Dimensions.get('window').width;}
@@ -91,7 +100,7 @@ export default class DGCheckImageView extends Component{
                         scrollEnabled   = {this.state.scrollEnabled}
                         ref             = {(ref)=>(this._flatlist = ref)}
                         onScrollEndDrag = {this._onScrollEndDrag}
-                        contentOffset   = {{x:this.props.currentIndex*Dimensions.get('window').width,y:0}}
+                        contentOffset   = {{x:this.state.showIndex*Dimensions.get('window').width,y:0}}
                         onMomentumScrollEnd = {this._onScrollEndDrag}
                     />
 
