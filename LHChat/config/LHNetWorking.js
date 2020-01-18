@@ -147,6 +147,11 @@ export default class LHNetWorking{
                 )
     }
 
+    // 更新token信息
+    updateToken = (data) =>{
+        lh_token = data.token;
+    }
+
     // 数据转换成表单格式的。eg:value=123&value1=321
     paramsFromdata = (body)=>{
         if(body.length == 0)return '';

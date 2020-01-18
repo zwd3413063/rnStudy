@@ -163,6 +163,8 @@ export default class DGLoginScreen extends Component{
 
                 // 保存登录的账号与密码
                 Storage.save({key:local_user_key,data:body});
+                // 更新token字段信息
+                net.updateToken(ponse.data);
                 //保存token信息，有效期一个月
                 if(ponse)Storage.save({key:login_response_info,data:ponse.data,timeOut:3600*24*30})
                 .then((post)=>{

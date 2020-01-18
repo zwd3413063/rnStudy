@@ -4,8 +4,10 @@ import AsyncStorage from '@react-native-community/async-storage';
 const local_user_key = "localUserKey";              // 存取账号密码的key
 const login_response_info = "loginResponseInfo";    // 登录成功的token信息
 
-export {local_user_key,
-        login_response_info};
+export {
+    local_user_key,
+    login_response_info
+};
 
 let storage = new Storage({
     //最大容量，默认值1000条数据循环存储
