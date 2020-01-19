@@ -17,35 +17,55 @@ import ImageZoom from 'react-native-image-pan-zoom';
 imageModels 
 imageURLs
 */
-export default class DGCheckImageView extends Component{
+export default class DGCheckImageView extends PureComponent{
     constructor(){
         super();
         this.state = {
             scrollEnabled:true, // 是否可以滑动，主要是为了大图查看时，不能让底部的滑动视图响应手势 
             maxIndex:0,         // 最大图片数量
             showIndex:0,        // 初始点击的第几张图片
-            isShowed:false      // 此字段为了判断是否为visible 显示或者关闭。只调用一次。不然props和state会冲突。没得办法呀！
+            isShowed:false,     // 此字段为了判断是否为visible 显示或者关闭。只调用一次。不然props和state会冲突。没得办法呀！
+            currentIndex:0,     // 当前的页面
+            imageItems:[],      // 图片数组
         }
         this.contentOffset ={x:0,y:0};
     }
 
     static getDerivedStateFromProps(nextProps,prevState){
-        let state = {...prevState};
-        if(nextProps.imageModels)   state.maxIndex = nextProps.imageModels.length;
-        if(nextProps.visible && !state.isShowed){
+        let state = {};
+
+        // 调用显示
+        if(nextProps.visible && !prevState.isShowed){
+            if(nextProps.imageModels)   state.maxIndex = nextProps.imageModels.length;
             state.isShowed = true;
             state.showIndex = nextProps.currentIndex;
+            state.currentIndex = nextProps.currentIndex;
 
-        }else  if(!nextProps.visible && state.isShowed){
+            // 设置图片数组
+            let datas = [];
+            if(nextProps.imageModels){
+                let index = 0;
+                datas = nextProps.imageModels.map((item) =>{
+                    let newItem = {...item,index:index,visible:true};
+                    index++;
+                    return newItem;
+                });
+            }
+            if(nextProps.imageURLs){
+                let index = 0;
+                datas = nextProps.imageURLs.map((uri)=>{
+                    let item = {uri,index,visible:true};
+                    index ++;
+                    return item;
+                });
+            }
+            state.imageItems = datas;
+
+        // 调用关闭
+        }else  if(!nextProps.visible && prevState.isShowed){
             state.isShowed = false;
         }
         return state;
-    }
-
-    _data = ()=>{
-        if(this.props.imageModels)return this.props.imageModels;
-        if(this.props.imageURLs)return this.props.imageURLs;
-        return [];
     }
 
     //更新title
@@ -56,7 +76,7 @@ export default class DGCheckImageView extends Component{
     // 判断可否改变滑动状态
     _scrollEnabledClick = (able)=>{
         let intValue = 0;
-        if(this.contentOffset){ intValue = this.contentOffset.x/Dimensions.get('window').width;}
+        if(this.contentOffset){ intValue = parseFloat(this.contentOffset.x)/Dimensions.get('window').width;}
         if(intValue%1==0){
             if(this.state.scrollEnabled != able){
                 this.setState((state)=>({scrollEnabled : able}));
@@ -66,7 +86,9 @@ export default class DGCheckImageView extends Component{
 
     // 恢复滑动
     _recoverMove = (able) =>{
-        this.setState((state)=>({scrollEnabled : able}));
+        if(this.state.scrollEnabled != able){
+            this.setState((state)=>({scrollEnabled : able}));
+        }
     }
 
     // 滑动停止
@@ -74,6 +96,20 @@ export default class DGCheckImageView extends Component{
         this.contentOffset = event.nativeEvent.contentOffset;
         let currentIndex = parseInt(this.contentOffset.x/Dimensions.get('window').width);
         if(this.props.changeCurrentIndex)this.props.changeCurrentIndex(currentIndex);
+
+        // 切换时，将放大的图片恢复原来的大小
+        if(this.state.currentIndex != currentIndex){
+           let imageItems = this.state.imageItems.map((item)=>{
+               let visible = (currentIndex === item.index)? true:false;
+               return {...item,visible};
+           });
+           this.setState((state)=>({currentIndex,imageItems}));
+        }
+    }
+
+    // 滑动
+    _onScroll = (event)=>{
+        this.contentOffset = event.nativeEvent.contentOffset;
     }
 
     // 关闭
@@ -86,13 +122,12 @@ export default class DGCheckImageView extends Component{
             <Modal visible = {this.props.visible}>
                 <View style ={{flex:1,backgroundColor:'#000000'}}>
                     <FlatList
-                        data            = {this._data()}
+                        data            = {this.state.imageItems}
                         renderItem      = {({item})=>(<DGCheckImageItem item = {item} 
                                                                         changeSuperAbleMove = {this._scrollEnabledClick} 
                                                                         recoverMove = {this._recoverMove}
                                                                         onPress = {this._dismiss}
                                                                         />)}
-
                         keyExtractor    = {(item,index) =>(index.toString())}
                         horizontal      = {true}
                         showsHorizontalScrollIndicator = {false}
@@ -102,10 +137,11 @@ export default class DGCheckImageView extends Component{
                         onScrollEndDrag = {this._onScrollEndDrag}
                         contentOffset   = {{x:this.state.showIndex*Dimensions.get('window').width,y:0}}
                         onMomentumScrollEnd = {this._onScrollEndDrag}
+                        onScroll        = {this._onScroll}
                     />
 
                     <DGNavigationBar    backgroundColor = {'rgba(0,0,0,0.1)'}
-                                        title = {this._updateTitle(this.props.currentIndex)} 
+                                        title = {this._updateTitle(this.state.currentIndex)} 
                                         tintColor   = '#FFFFFF'
                                         titleColor  = '#FFFFFF'
                                         leftOnPress = {this.leftOnPress}
@@ -118,7 +154,7 @@ export default class DGCheckImageView extends Component{
 }
 
 // item 数据
-class DGCheckImageItem extends Component{
+class DGCheckImageItem extends PureComponent{
     constructor(){
         super();
 
@@ -135,6 +171,7 @@ class DGCheckImageItem extends Component{
 
     componentDidMount(){
         this._imageFrame(this.props.item);
+        this._resetScalelisten(this.props.item);
     }
 
     static getDerivedStateFromProps(nextProps,prevState){
@@ -185,9 +222,16 @@ class DGCheckImageItem extends Component{
           console.log('长按');
       }
 
+      // 监听是否恢复缩放比例
+      _resetScalelisten =(visible)=>{
+        if(!visible && this._imageZoomRef){
+            this._imageZoomRef.reset();
+        }
+      }
+
       // 放手
       _responderRelease = ()=>{
-          if(this.props.recoverMove)this.props.recoverMove(this.superAbleMove);
+          if(this.props.recoverMove)this.props.recoverMove(true);
       }
 
       // 移动
@@ -211,6 +255,8 @@ class DGCheckImageItem extends Component{
       }
 
     render(){
+        console.log('render');
+        this._resetScalelisten(this.props.item.visible);
         return(
             <View style = {styles.imageItem}>
                 <ImageZoom  cropWidth={Dimensions.get('window').width}
@@ -222,6 +268,7 @@ class DGCheckImageItem extends Component{
                             horizontalOuterRangeOffset = {this._horizontalOuterRangeOffset}
                             onMove = {this._onMove}
                             responderRelease = {this._responderRelease}
+                            ref = {(ref)=>{this._imageZoomRef = ref}}
                             >
                     <Image source = {{uri:this.props.item.uri}} 
                             style = {{position: 'absolute',left:this.props.imageLeft,top:this.props.imageTop,height:this.state.imageHeight,width:this.state.imageWidth,backgroundColor:'#696969'}}

@@ -81,7 +81,7 @@ export default class DGHomeDetailScreen extends Component{
 
     // 切换查看的图片
     _changeCurrentIndex = (index)=>{
-        this.setState((state)=>({checkImageIndex:index}));
+        // this.setState((state)=>({checkImageIndex:index}));
     }
 
     // 每一行的内容
