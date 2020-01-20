@@ -22,17 +22,19 @@ export default class PhotosItemScreen extends Component{
     }
 
     //action点击事件
-    onPress = (item,index)=>{
-        if(this.props.onPress) this.props.onPress(item,index);
+    onPress = (item,index,imageRef)=>{
+        if(this.props.onPress) this.props.onPress(item,index,imageRef);
     }
 
     // 渲染每一行
-    _renderItem = (item, index, separators)=>{
+    _renderItem = (item, index)=>{
+        let imageRef = null;
         return (
-            <TouchableOpacity onPress = {()=>(this.onPress(item,index))}>
+            <TouchableOpacity onPress = {()=>(this.onPress(item,index,imageRef))}>
                 <View style ={[styles.renderItem,{width:this.props.style.height-10}]}>
-                    <Image  style = {{backgroundColor:'#FFC1E5',position:'absolute',left:0,top:0,right:0,height:this.props.style.height-10}}
-                            source ={{uri:item.uri}}
+                    <Image  style   =   {{backgroundColor:'#FFC1E5',position:'absolute',left:0,top:0,right:0,height:this.props.style.height-10}}
+                            source  =   {{uri:item.uri}}
+                            ref     =   {(ref)=>{imageRef=ref}}
                         />
                 </View>
             </TouchableOpacity>
@@ -68,14 +70,16 @@ export default class PhotosItemScreen extends Component{
                 contentContainerStyle   = {{alignItems:'stretch',padding:5}}
                            horizontal   = {true}
                            data         = {this.props.imageModels}
-                           renderItem   = {({item, index, separators})=>(this._renderItem(item, index, separators))}
+                           renderItem   = {({item, index, separators})=>(this._renderItem(item, index))}
                            keyExtractor = {(item,index)=>(index.toString())}
                            showsHorizontalScrollIndicator = {false}
+                           ref          = {(ref)=>{this.flatListRef = ref}}
                 />
             </View>
         )
     }
 }
+
 
 const styles = StyleSheet.create({
     renderItem:{

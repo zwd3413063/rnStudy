@@ -69,19 +69,16 @@ export default class DGHomeDetailScreen extends Component{
         });
     }
 
-    // action 事件
-    checkImageOnpress = (item,index)=>{
-        this.setState((state)=>({checkImage:true,checkImageIndex:index}));
+    /**action 事件*/                                
+    //查看大图
+    _checkImageOnpress = (item,showIndex,imageRef)=>{
+        let imageModels = this.state.userDetailInfo.imageModels;
+        this.checkImageRef._show({imageModels,showIndex,imageRef});
     }
 
     // 关闭 大图查看
     _dismissChekImage = ()=>{
-        this.setState((state)=>({checkImage:false}));
-    }
-
-    // 切换查看的图片
-    _changeCurrentIndex = (index)=>{
-        // this.setState((state)=>({checkImageIndex:index}));
+        console.log("关闭");
     }
 
     // 每一行的内容
@@ -93,7 +90,7 @@ export default class DGHomeDetailScreen extends Component{
                                         imageModels = {this.state.userDetailInfo.imageModels}
                                         showPhoto   = {this.state.userDetailInfo.showPhoto}
                                         photoMoney  = {this.state.userDetailInfo.photoMoney}
-                                        onPress     = {this.checkImageOnpress}
+                                        onPress     = {this._checkImageOnpress}
                 />
             )
         }
@@ -216,13 +213,7 @@ export default class DGHomeDetailScreen extends Component{
                 />
 
                 {/* 大图全屏查看 */}
-                <CheckImageView visible     = {this.state.checkImage}
-                                imageModels = {this.state.userDetailInfo.imageModels}
-                                currentIndex= {this.state.checkImageIndex}
-                                dismiss     = {this._dismissChekImage}
-                                changeCurrentIndex = {this._changeCurrentIndex}
-
-                />
+                <CheckImageView ref = {(ref)=>(this.checkImageRef = ref)}/>
             </View>
         )
     }
