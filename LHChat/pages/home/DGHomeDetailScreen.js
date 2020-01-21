@@ -69,16 +69,16 @@ export default class DGHomeDetailScreen extends Component{
         });
     }
 
+    // 查看大图所需的；获取图片的Dom信息，
+    _chekImageGetItemRef = (index)=>{
+        return this.photosRef._getRefItem(index);
+    }
+
     /**action 事件*/                                
     //查看大图
     _checkImageOnpress = (item,showIndex,imageRef)=>{
         let imageModels = this.state.userDetailInfo.imageModels;
         this.checkImageRef._show({imageModels,showIndex,imageRef});
-    }
-
-    // 关闭 大图查看
-    _dismissChekImage = ()=>{
-        console.log("关闭");
     }
 
     // 每一行的内容
@@ -91,6 +91,7 @@ export default class DGHomeDetailScreen extends Component{
                                         showPhoto   = {this.state.userDetailInfo.showPhoto}
                                         photoMoney  = {this.state.userDetailInfo.photoMoney}
                                         onPress     = {this._checkImageOnpress}
+                                        ref         = {(ref)=>{this.photosRef=ref}}
                 />
             )
         }
@@ -213,7 +214,9 @@ export default class DGHomeDetailScreen extends Component{
                 />
 
                 {/* 大图全屏查看 */}
-                <CheckImageView ref = {(ref)=>(this.checkImageRef = ref)}/>
+                <CheckImageView ref         = {(ref)=>(this.checkImageRef = ref)}
+                                getItemRef  = {this._chekImageGetItemRef}
+                                />
             </View>
         )
     }

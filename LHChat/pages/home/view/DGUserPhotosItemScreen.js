@@ -6,7 +6,8 @@ import {
     FlatList,
     StyleSheet,
     Image,
-    TouchableOpacity
+    TouchableOpacity,
+    findNodeHandle
 }  from 'react-native';
 
 import DGButton from 'dg-public/DGButton';
@@ -19,12 +20,20 @@ import DGButton from 'dg-public/DGButton';
 export default class PhotosItemScreen extends Component{
     constructor(){
         super();
+        this.visibleItemIndexs = [];    // 可见的items的index
+        this.refItems          = {};    // 所有items的DOM信息
     }
+
+    // 获取可见的cells
+    _onViewableItemsChanged = ({ viewableItems, changed }) => {
+        this.visibleItemIndexs = viewableItems.map((value)=>(value.index));
+      }
 
     //action点击事件
     onPress = (item,index,imageRef)=>{
         if(this.props.onPress) this.props.onPress(item,index,imageRef);
     }
+
 
     // 渲染每一行
     _renderItem = (item, index)=>{
@@ -32,13 +41,28 @@ export default class PhotosItemScreen extends Component{
         return (
             <TouchableOpacity onPress = {()=>(this.onPress(item,index,imageRef))}>
                 <View style ={[styles.renderItem,{width:this.props.style.height-10}]}>
-                    <Image  style   =   {{backgroundColor:'#FFC1E5',position:'absolute',left:0,top:0,right:0,height:this.props.style.height-10}}
+                    <Image  id      =   'subItem1'
+                            style   =   {{backgroundColor:'#FFC1E5',position:'absolute',left:0,top:0,right:0,height:this.props.style.height-10}}
                             source  =   {{uri:item.uri}}
-                            ref     =   {(ref)=>{imageRef=ref}}
+                            ref     =   {(ref)=>{
+                                            imageRef = ref;
+                                            this.refItems[index] = ref;
+                                        }}
                         />
                 </View>
             </TouchableOpacity>
         )
+    }
+
+    // 获取某一行的DOM信息
+    _getRefItem = (index)=>{
+        // 首先判断是否在可见范围。不在可见范围的不反悔信息
+        // indexOf 函数返回的是元素在数组中第一次出现的索引，没出现过就返回-1
+      if(this.visibleItemIndexs.indexOf(index)== -1)return null;
+        
+        // 然后去查询
+        let imageRef = this.refItems[index];
+        return imageRef;
     }
 
     render(){
@@ -73,7 +97,7 @@ export default class PhotosItemScreen extends Component{
                            renderItem   = {({item, index, separators})=>(this._renderItem(item, index))}
                            keyExtractor = {(item,index)=>(index.toString())}
                            showsHorizontalScrollIndicator = {false}
-                           ref          = {(ref)=>{this.flatListRef = ref}}
+                           onViewableItemsChanged = {this._onViewableItemsChanged}
                 />
             </View>
         )

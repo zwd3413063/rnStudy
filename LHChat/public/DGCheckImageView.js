@@ -9,6 +9,7 @@ import {
     Dimensions,
     PanResponder,
     TouchableOpacity,
+    LayoutAnimation,
     UIManager,
     Animated,
     findNodeHandle,
@@ -22,86 +23,129 @@ imageModels
 imageURLs
 */
 export default class DGCheckImageView extends Component{
-        constructor(){
-            super();
-            this.state = {
-                scrollEnabled:true,     // 是否可以滑动，主要是为了大图查看时，不能让底部的滑动视图响应手势 
-                maxIndex:0,             // 最大图片数量
-                showIndex:0,            // 初始点击的第几张图片
-                isShowed:false,         // 此字段为了判断是否显示大图查看
-                currentIndex:0,         // 当前的页面
-                imageItems:[],          // 图片数组
-                animationStatus:0,      // 等待显示
+    constructor(){
+        super();
+        this.state = {
+            scrollEnabled:true,     // 是否可以滑动，主要是为了大图查看时，不能让底部的滑动视图响应手势 
+            maxIndex:0,             // 最大图片数量
+            showIndex:0,            // 初始点击的第几张图片
+            isShowed:false,         // 此字段为了判断是否显示大图查看
+            currentIndex:0,         // 当前的页面
+            imageItems:[],          // 图片数组
+            animationStatus:0,      // 等待显示
 
-                /*动画相关*/
-                animationOpacity:new Animated.Value(0),     // 背景黑
-                animationTop:new Animated.Value(0),         // 图片位置
-                animationLeft:new Animated.Value(0),        // 图片位置
-                animationWidth:new Animated.Value(100),     // 图片位置
-                animationHeight:new Animated.Value(100),    // 图片位置
-            }
-            this.contentOffset ={x:0,y:0};
-            this.showInImageRect = {imageWidth:0,imageHeight:0,imageLeft:0,imageTop:0};// 显示图片的尺寸，这个是可以率先计算出来的
+            /*动画相关*/
+            animationOpacity:new Animated.Value(0),     // 背景黑
+            animationImageOpacity:new Animated.Value(1),
+            animationTop:0,
+            animationLeft:0,
+            animationWidth:100,
+            animationHeight:100
         }
+        this.contentOffset ={x:0,y:0};
+        this.showInImageRect = {imageWidth:0,imageHeight:0,imageLeft:0,imageTop:0};// 显示图片的尺寸，这个是可以率先计算出来的
+    }
 
-        // 关闭
-        _dismiss =()=>{
-            this.setState((state)=>({isShowed:false}));
-            if(this.props.dismiss)this.props.dismiss();
+    // 关闭
+    _dismiss =({imageTop,imageLeft,imageHeight,imageWidth})=>{
+        //1、 先展示过渡视图
+        this.setState({animationHeight:imageHeight,
+                        animationWidth:imageWidth,
+                        animationLeft:imageLeft,
+                        animationTop:imageTop,
+                        animationImageOpacity:new Animated.Value(1),
+                        animationOpacity:new Animated.Value(1),     // 背景黑
+                        animationStatus:1});
+
+        // 2、再去处理动画信息
+        let imageRef = null;
+        if(this.props.getItemRef)imageRef = this.props.getItemRef(this.state.currentIndex);
+        // 有图片尺寸信息（说明当前的cell是可见的）
+        if(imageRef){
+            const handle = findNodeHandle(imageRef);
+            UIManager.measureInWindow(handle,(x, y, width, height)=>{
+                // 设置动画属性（延时一下执行。不然有BUG）
+                setTimeout(() => {
+                    let duration = 400;// 动画时间
+                    // 这里的加100（毫秒）是为了保证下面的动画执行100%完成
+                    Animated.timing(this.state.animationOpacity,{toValue:0,duration:duration+100}).start(()=>{
+                        // 动画结束后关闭视图
+                        this.setState((state)=>({animationStatus:0,isShowed:false}));
+                        if(this.props.dismiss)this.props.dismiss();
+                    });
+                    //启动动画。调用此函数后。再修改state，就会产生动画效果
+                    this._configAnimation(duration);
+                    this.setState({animationHeight:height,animationWidth:width,animationLeft:x,animationTop:y});
+                }, 100);
+            });
+        
+        // 没有图片尺寸信息（说明当前的cell已经划出了屏幕，或者没有实现this.props.getItemRef函数）
+        }else{
+            let duration = 300;// 动画时间
+            Animated.timing(this.state.animationImageOpacity,{toValue:0,duration:duration+100}).start(()=>{
+                // 动画结束后关闭视图
+                this.setState((state)=>({animationStatus:0,isShowed:false}));
+                if(this.props.dismiss)this.props.dismiss();
+            });
         }
+    }
     
-        // 显示
-        _show = ({imageModels,imageURLs,showIndex = 0,imageRef})=>{
-            let state = {};
-            state.isShowed = true;
-            state.showIndex = showIndex;
-            state.currentIndex = showIndex;
-            state.animationStatus = 0;
-            // 设置图片数组
-            let datas = [];
-            if(imageModels){
-                let index = 0;
-                datas = imageModels.map((item) =>{
-                    let newItem = {...item,index:index,visible:true};
-                    index++;
-                    return newItem;
-                });
-            }
-            if(imageURLs){
-                let index = 0;
-                datas = imageURLs.map((uri)=>{
-                    let item = {uri,index,visible:true};
-                    index ++;
-                    return item;
-                });
-            }
-            state.imageItems = datas;
-            state.maxIndex = datas.length;
-            this.setState((OldState)=>({...state}));
-
-            // 显示动画
-            let item = state.imageItems[showIndex];
-            if(state.imageItems.length>0)this._starAnimation(item,imageRef);
-            
+    // 显示
+    _show = ({imageModels,imageURLs,showIndex = 0,imageRef})=>{
+        let state = {};
+        state.isShowed = true;
+        state.showIndex = showIndex;
+        state.currentIndex = showIndex;
+        state.animationStatus = 0;
+        state.animationImageOpacity = 1;
+        // 设置图片数组
+        let datas = [];
+        if(imageModels){
+            let index = 0;
+            datas = imageModels.map((item) =>{
+                let newItem = {...item,index:index,visible:true};
+                index++;
+                return newItem;
+            });
         }
+        if(imageURLs){
+            let index = 0;
+            datas = imageURLs.map((uri)=>{
+                let item = {uri,index,visible:true};
+                index ++;
+                return item;
+            });
+        }
+        state.imageItems = datas;
+        state.maxIndex = datas.length;
+        this.setState((OldState)=>({...state}));
+
+        // 显示动画
+        let item = state.imageItems[showIndex];
+        if(state.imageItems.length>0)this._starAnimation(item,showIndex);
+        
+    }
     
 
     // 动画
-    _starAnimation = (item,imageRef)=>{
+    _starAnimation = (item,showIndex)=>{
+        let imageRef = null;
+        if(this.props.getItemRef)imageRef = this.props.getItemRef(showIndex);
+
         // 恢复默认值
         if(imageRef){
             const handle = findNodeHandle(imageRef);
             UIManager.measureInWindow(handle,(x, y, width, height)=>{
                 this.setState((state)=>({
                     animationOpacity:new Animated.Value(0),     // 背景黑
-                    animationTop:new Animated.Value(y),         // 图片位置
-                    animationLeft:new Animated.Value(x),        // 图片位置
-                    animationWidth:new Animated.Value(width),   // 图片位置
-                    animationHeight:new Animated.Value(height), // 图片位置
+                    animationTop:y,
+                    animationLeft:x,
+                    animationWidth:width,
+                    animationHeight:height,
+                    animationStatus:1
                 }));
             });
         }
-
         Image.getSize(item.uri,
             // 成功的回调
             (width,height)=>{
@@ -124,22 +168,17 @@ export default class DGCheckImageView extends Component{
 
                 // 保存一下这个图片的尺寸信息
                 this.showInImageRect = {imageHeight,imageWidth,imageLeft,imageTop}
-
                 // 设置动画属性（延时一下执行。不然有BUG）
                 setTimeout(() => {
-                    let duration = 300;// 动画时间
-                    Animated.timing(this.state.animationOpacity,{toValue:1,duration}).start();
-    
-                    let animtaion1 =  Animated.timing(this.state.animationLeft,{toValue:imageLeft,duration,easing: Easing.ease});
-                    let animtaion2 =  Animated.timing(this.state.animationTop,{toValue:imageTop,duration,easing: Easing.ease});
-                    let animtaion3 =  Animated.timing(this.state.animationWidth,{toValue:imageWidth,duration,easing: Easing.ease});
-                    let animtaion4 =  Animated.timing(this.state.animationHeight,{toValue:imageHeight,duration,easing: Easing.ease});
-                    // 启动动画
-                    this.setState((state)=>({animationStatus:1}));
-                    Animated.parallel([animtaion1,animtaion2,animtaion3,animtaion4]).start(()=>{
+                    let duration = 400;// 动画时间
+                    // 这里的加100（毫秒）是为了保证下面的动画执行100%完成
+                    Animated.timing(this.state.animationOpacity,{toValue:1,duration:duration+100}).start(()=>{
                         // 动画结束后关闭视图
                         this.setState((state)=>({animationStatus:2}));
                     });
+
+                    this._configAnimation(duration);//启动动画。调用此函数后。再修改state，就会产生动画效果
+                    this.setState({animationHeight:imageHeight,animationWidth:imageWidth,animationLeft:imageLeft,animationTop:imageTop});
                 }, 100);
 
             },
@@ -149,15 +188,31 @@ export default class DGCheckImageView extends Component{
                 let imageHeight = g_screen.width;
                 let imageLeft   = 0;
                 let imageTop    = (g_screen.height - g_screen.width)/2.0;
+                // 直接显示图片。没有动画了
+                this.setState((state)=>({animationStatus:2}));
             }
         );
     }
 
-    //获取动画起始位置的大小
-    _getStarPoint = (separators)=>{
-
+    // 动画配置
+    _configAnimation =(duration)=>{
+        // LayoutAnimation 动画，比直接使用animationed性能要高很多。直接调用的native动画库，而animated使用的JS动画,所以大家都懂的：卡的跟逼一样。
+        LayoutAnimation.configureNext({
+            duration: duration,   // 动画持续时间
+            // 若是新布局的动画类型
+            create: {    
+                type: 'easeInEaseOut',  // 线性模式，LayoutAnimation.Types.linear 写法亦可
+                property: 'opacity'     // 动画属性，除了opacity 还有一个 scaleXY 可以配置，LayoutAnimation.Properties.opacity 写法亦可
+            },
+            // 若是布局更新的动画类型
+            update: {  
+                type: 'easeInEaseOut',   // 缓入缓出
+                property: 'opacity'      // 动画属性，除了opacity 还有一个 scaleXY 可以配置，LayoutAnimation.Properties.opacity 写法亦可
+            }
+            });
     }
 
+    /*****滑动代理函数******/
     //更新title
     _updateTitle = (index)=>{
         return (index+1)+'/'+this.state.maxIndex;
@@ -206,27 +261,28 @@ export default class DGCheckImageView extends Component{
             console.log('页面准备');
             return null;
         }
-        // 正在动画中
+        // 正在动画中(类似与iOS中的转场动画所使用的过渡视图方式)
         if(this.state.animationStatus == 1){
             console.log('动画进行中...');
             return(
-                <Modal transparent = {true} style = {{flex:1}}>
+                <Animated.View style = {{position:'absolute',left:0,top:0,right:0,bottom:0,backgroundColor:'rgba(0,0,0,0)',opacity:this.state.animationImageOpacity}}>
                     <Animated.View style = {{flex:1,backgroundColor:'#000000',opacity:this.state.animationOpacity}}>
                     </Animated.View>
-                    <Animated.Image source = {{uri:this.state.imageItems[this.state.showIndex].uri}} 
+                    <Image source = {{uri:this.state.imageItems[this.state.currentIndex].uri}} 
                         style  = {{position:'absolute',
                                     top:this.state.animationTop,
                                     left:this.state.animationLeft,
                                     width:this.state.animationWidth,
-                                    height:this.state.animationHeight}}>
-                    </Animated.Image>
-                </Modal>
+                                    height:this.state.animationHeight
+                                    }}>
+                    </Image>
+                </Animated.View>
             );
         }
         // 动画完了。展示正式图
         if(this.state.animationStatus == 2){
             return (
-                <Modal visible = {this.state.isShowed}>
+                <Modal visible = {this.state.isShowed} transparent = {true}>
                     <View style ={{flex:1,backgroundColor:'#000000'}}>
                         <FlatList
                             data            = {this.state.imageItems}
@@ -234,7 +290,7 @@ export default class DGCheckImageView extends Component{
                                                                             changeSuperAbleMove = {this._scrollEnabledClick} 
                                                                             recoverMove = {this._recoverMove}
                                                                             onPress = {this._dismiss}
-                                                                            defaultRect = {this.state.showIndex === item.index? this.defaultRect:null}
+                                                                            defaultRect = {this.state.showIndex === item.index? this.showInImageRect:null}
                                                                             />)}
                             keyExtractor    = {(item,index) =>(index.toString())}
                             horizontal      = {true}
@@ -275,7 +331,6 @@ class DGCheckImageItem extends PureComponent{
             imageHeight:g_screen.width,
             imageTop:0,
             imageLeft:0,
-            backgroundColor:'red'
         }
 
         // 父类scrollView是否可以滑动
@@ -289,7 +344,6 @@ class DGCheckImageItem extends PureComponent{
 
     static getDerivedStateFromProps(nextProps,prevState){
         let state = {};
-        console.log(nextProps);
         if(nextProps.defaultRect){
             state = {...nextProps.defaultRect};
         }
@@ -318,8 +372,7 @@ class DGCheckImageItem extends PureComponent{
                     imageLeft  = (g_screen.width - imageWidth)/2.0;
                     imageTop   = 0;
                 }
-                let backgroundColor = 'blue';
-                this.setState((state)=>({imageWidth,imageHeight,imageLeft,imageTop,backgroundColor}));
+                this.setState((state)=>({imageWidth,imageHeight,imageLeft,imageTop}));
             },
             // 失败的回调
             (error)=>{
@@ -333,7 +386,7 @@ class DGCheckImageItem extends PureComponent{
     }
       // 单击
       _onPress =()=>{
-          if(this.props.onPress)this.props.onPress();
+          if(this.props.onPress)this.props.onPress({...this.state});
       }
 
       // 长按
@@ -375,7 +428,7 @@ class DGCheckImageItem extends PureComponent{
     render(){
         this._resetScalelisten(this.props.item.visible);
         return(
-            <View style = {[styles.imageItem,{backgroundColor:this.state.backgroundColor}]}>
+            <View style = {[styles.imageItem,{backgroundColor:'#000000'}]}>
                 <ImageZoom  cropWidth={Dimensions.get('window').width}
                             cropHeight={Dimensions.get('window').height}
                             imageWidth={Dimensions.get('window').width}
