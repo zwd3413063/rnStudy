@@ -18,6 +18,8 @@ import {
 
 import DGNavigationBar from 'dg-public/DGNavigationBar';
 import ImageZoom from 'react-native-image-pan-zoom';
+
+const ITEM_WIDTH = Dimensions.get('window').width;
 /*
 imageModels 
 imageURLs
@@ -82,7 +84,7 @@ export default class DGCheckImageView extends Component{
         // 没有图片尺寸信息（说明当前的cell已经划出了屏幕，或者没有实现this.props.getItemRef函数）
         }else{
             let duration = 300;// 动画时间
-            Animated.timing(this.state.animationImageOpacity,{toValue:0,duration:duration+100}).start(()=>{
+            Animated.timing(this.state.animationImageOpacity,{toValue:0,duration}).start(()=>{
                 // 动画结束后关闭视图
                 this.setState((state)=>({animationStatus:0,isShowed:false}));
                 if(this.props.dismiss)this.props.dismiss();
@@ -174,22 +176,23 @@ export default class DGCheckImageView extends Component{
                     // 这里的加100（毫秒）是为了保证下面的动画执行100%完成
                     Animated.timing(this.state.animationOpacity,{toValue:1,duration:duration+100}).start(()=>{
                         // 动画结束后关闭视图
-                        this.setState((state)=>({animationStatus:2}));
+                        this.setState((state)=>({animationStatus:2,showIndex}));
                     });
 
                     this._configAnimation(duration);//启动动画。调用此函数后。再修改state，就会产生动画效果
                     this.setState({animationHeight:imageHeight,animationWidth:imageWidth,animationLeft:imageLeft,animationTop:imageTop});
+
                 }, 100);
 
             },
             // 失败的回调
             (error)=>{
-                let imageWidth  = g_screen.width;
-                let imageHeight = g_screen.width;
-                let imageLeft   = 0;
-                let imageTop    = (g_screen.height - g_screen.width)/2.0;
-                // 直接显示图片。没有动画了
-                this.setState((state)=>({animationStatus:2}));
+                // 直接显示图片。没有动画了                
+                let duration = 300;// 动画时间
+                Animated.timing(this.state.animationImageOpacity,{toValue:1,duration}).start(()=>{
+                    // 动画结束后关闭视图
+                    this.setState((state)=>({animationStatus:2,showIndex}));
+                });
             }
         );
     }
@@ -255,35 +258,24 @@ export default class DGCheckImageView extends Component{
         this.contentOffset = event.nativeEvent.contentOffset;
     }
 
+    // 设置显示位置
+    _contentOffset = (showIndex)=>{
+        console.log('当前页面:',showIndex,"  x:",showIndex*Dimensions.get('window').width);
+        return {x:showIndex*Dimensions.get('window').width,y:0};
+    }
+
     render(){
         // 页面准备中
         if(this.state.animationStatus == 0){
             console.log('页面准备');
             return null;
         }
-        // 正在动画中(类似与iOS中的转场动画所使用的过渡视图方式)
-        if(this.state.animationStatus == 1){
-            console.log('动画进行中...');
-            return(
-                <Animated.View style = {{position:'absolute',left:0,top:0,right:0,bottom:0,backgroundColor:'rgba(0,0,0,0)',opacity:this.state.animationImageOpacity}}>
-                    <Animated.View style = {{flex:1,backgroundColor:'#000000',opacity:this.state.animationOpacity}}>
-                    </Animated.View>
-                    <Image source = {{uri:this.state.imageItems[this.state.currentIndex].uri}} 
-                        style  = {{position:'absolute',
-                                    top:this.state.animationTop,
-                                    left:this.state.animationLeft,
-                                    width:this.state.animationWidth,
-                                    height:this.state.animationHeight
-                                    }}>
-                    </Image>
-                </Animated.View>
-            );
-        }
-        // 动画完了。展示正式图
-        if(this.state.animationStatus == 2){
-            return (
-                <Modal visible = {this.state.isShowed} transparent = {true}>
-                    <View style ={{flex:1,backgroundColor:'#000000'}}>
+
+        console.log("加载完成!",this.state.showIndex);
+        return (
+            <Modal visible = {true} transparent = {true}>
+                {/* 展示正式图 */}
+                <View style ={{flex:1,backgroundColor:'#000000',opacity:(this.state.animationStatus == 2? 1:0)}}>
                         <FlatList
                             data            = {this.state.imageItems}
                             renderItem      = {({item})=>(<DGCheckImageItem item = {item} 
@@ -299,21 +291,40 @@ export default class DGCheckImageView extends Component{
                             scrollEnabled   = {this.state.scrollEnabled}
                             ref             = {(ref)=>(this._flatlist = ref)}
                             onScrollEndDrag = {this._onScrollEndDrag}
-                            contentOffset   = {{x:this.state.showIndex*Dimensions.get('window').width,y:0}}
                             onMomentumScrollEnd = {this._onScrollEndDrag}
                             onScroll        = {this._onScroll}
+                            initialScrollIndex = {this.state.showIndex}
+                            getItemLayout   ={(data, index) => ({length: 375, offset:375 *index,index})}
                         />
-    
+
                         <DGNavigationBar    backgroundColor = {'rgba(0,0,0,0.1)'}
                                             title = {this._updateTitle(this.state.currentIndex)} 
                                             tintColor   = '#FFFFFF'
                                             titleColor  = '#FFFFFF'
                                             leftOnPress = {this.leftOnPress}
                         />
-                    </View>
-                </Modal>
-            )
-        }
+                </View>
+
+                {/* 动画过渡视图 */}
+                <View style = {{position:'absolute',left:0,top:0,right:0,bottom:0,backgroundColor:'rgba(0,0,0,0)',opacity:(this.state.animationStatus == 1? 1:0)}}
+                      pointerEvents = 'none'>
+                    <Animated.View style = {{flex:1,opacity:this.state.animationImageOpacity,pointerEvents:'auto'}}>
+                        <Animated.View style = {{flex:1,backgroundColor:'#000000',opacity:this.state.animationOpacity}}>
+                        </Animated.View>
+
+                        <Image source = {{uri:this.state.imageItems[this.state.currentIndex].uri}} 
+                            style  = {{position:'absolute',
+                                        top:this.state.animationTop,
+                                        left:this.state.animationLeft,
+                                        width:this.state.animationWidth,
+                                        height:this.state.animationHeight,
+                                        }}>
+                        </Image>
+                    </Animated.View>
+                </View>
+
+            </Modal>
+        )
 
     }
 }
