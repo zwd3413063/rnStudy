@@ -16,6 +16,7 @@ import DGCitySelectScreen from '../pages/citySelect/LHCitySelectScreen';
 import LHUserInfoScreen from '../pages/myself/LHUserInfoScreen';
 import Storage,{login_response_info} from '../config/storage/DGAsyncStorage';
 import DGHomeDetailScreen from '../pages/home/DGHomeDetailScreen';
+import DGMessageHomeScreen from '../pages/message/DGMessageHomeScreen';
 
 // 各个导航控制器
 const loginStack = createStackNavigator(
@@ -61,11 +62,27 @@ const MyselfStack = createStackNavigator(
     }
 );
 
+// 消息中心
+const MessageStack = createStackNavigator(
+    {
+        root :DGMessageHomeScreen
+    },
+    {
+        initialRouteName:'root',
+        headerMode: 'none',         // 隐藏导航栏
+        navigationOptions:({navigation}) =>(
+            // 是否显示 tabar 。 只有index 为0时显示。表示为跟视图
+            {tabBarVisible:navigation.state.index === 0} // 隐藏标签栏
+        )
+    }
+)
+
 // 创建标签控制器
 const tabbarStack = createBottomTabNavigator(
     {
         home:homeStack,
         myself:MyselfStack,
+        message:MessageStack
     },
     {
         defaultNavigationOptions:({navigation})=>({
@@ -92,6 +109,8 @@ const getTabBarIcon =(navigation,focused,tintColor)=>{
       imgName = focused? 'home_light_icon':'home_gray_icon';
     }else if(routeName === 'myself'){
       imgName = focused? 'my_light_icon':'my_gray_icon';
+    }else if(routeName === 'message'){
+        imgName = focused? 'news_light_icon':'news_icon';
     }
 
    return <Image style ={{height:20,width:20}} source = {{uri:imgName}}></Image>;
@@ -104,7 +123,7 @@ const getTabbarTitle = (navigation,focused,tintColor) =>{
     let color = tintColor;
     if(routeName == 'home')title = '首页';
     else if (routeName == 'myself') title = '我的';
-
+    else if (routeName == 'message') title = '消息';
     if(!focused)color = '#999999';
     
     return (

@@ -4,6 +4,7 @@ import DGNavigationBar from '../../public/DGNavigationBar';
 import NavigationService  from '../../config/NavigationService';
 import DGAlertView from '../../public/DGAlertView';
 import LHView from '../../public/LHView';
+import Storage,{login_response_info} from '../../config/storage/DGAsyncStorage';
 
 export default class LHUserInfoScreen extends Component{
     constructor(){
@@ -31,6 +32,7 @@ export default class LHUserInfoScreen extends Component{
     logoutAction =(index)=>{
         if(index == 1){
             NavigationService.reset('Main');
+            Storage.delete({key:login_response_info});
         }
         clearTimeout(this.timer);
     };

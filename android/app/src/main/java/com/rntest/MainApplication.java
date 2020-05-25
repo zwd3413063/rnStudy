@@ -14,7 +14,7 @@ import com.facebook.soloader.SoLoader;
 
 import java.util.List;
 
-public class MainApplication extends Application implements ReactApplication {
+public class  extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
     @Override
@@ -30,6 +30,8 @@ public class MainApplication extends Application implements ReactApplication {
         无法自动加载安装包的。可以通过下面方式手动加载,eg:
         packages.add(new MyReactNativePackage());
        */
+      // 添加realm 数据存储框架
+      packages.add(new RealmReactPackage());
        return packages;
     }
 

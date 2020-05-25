@@ -5,7 +5,7 @@ import Storage,{login_response_info} from '../config/storage/DGAsyncStorage';
 
 
 // 项目base地址
-const lh_base_url = 'http://www.0792kk.cn/';
+const lh_base_url = 'http://103.45.120.154/fox/';
 
 const lh_header = {
     'Accept': 'application/json',
@@ -20,13 +20,16 @@ const lh_body = {
 }
 
 // 接口API
-const LH_LOGIN_PATH = '/api/user/login';                    // 登录
-const LH_HOME_USER_LIST = '/api/user/getUserList';          // 获取首页用户列表
-const LH_FETCH_USER_INFO  = "/api/user/getUserDate";        // 获取用户信息
+const LH_LOGIN_PATH         = '/api/user/login';                    // 登录
+const LH_HOME_USER_LIST     = '/api/user/getUserList';              // 获取首页用户列表
+const LH_FETCH_USER_INFO    = "/api/user/getUserDate";              // 获取用户信息
+const LH_FETCH_CODE         = "/api/user/sendMsg";                  // 获取验证码
+
 export {
     LH_LOGIN_PATH,
     LH_HOME_USER_LIST,
-    LH_FETCH_USER_INFO
+    LH_FETCH_USER_INFO,
+    LH_FETCH_CODE
 };
 
 // 接口回调状态码

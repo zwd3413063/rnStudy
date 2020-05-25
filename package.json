@@ -27,6 +27,7 @@
     "react-navigation-stack": "^2.0.14",
     "react-navigation-tabs": "^2.7.0",
     "react-redux": "^7.1.1",
+    "realm": "^6.0.1",
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0"
   },

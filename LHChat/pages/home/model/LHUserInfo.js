@@ -81,8 +81,9 @@ qualityCornerImage;           // 用户质量角标图
         let imageModels = [];
         if (!this.images)return imageModels;
         
-        for (const imageObject of this.images){
-                imageObject.uri = lh_image_base_url + imageObject.files.filePath;
+        for (const imageObject of this.images){ 
+                let filePath = imageObject.files? imageObject.files.filePath:'';
+                imageObject.uri = lh_image_base_url + filePath;
                 imageModels.push(imageObject);
         }
         return imageModels;

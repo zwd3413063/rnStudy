@@ -19,7 +19,6 @@ import RefreshList from '../../public/DGRefresh/DGRefreshList';
 import LHNetWorking ,{LH_HOME_USER_LIST} from '../../config/LHNetWorking';
 
 
-
 export default class HomeController extends Component{
     constructor(props){
         super(props);

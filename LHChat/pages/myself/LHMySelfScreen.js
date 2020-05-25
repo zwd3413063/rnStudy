@@ -4,6 +4,7 @@ import { StackActions, NavigationActions } from 'react-navigation';
 import DGNavigationBar from '../../public/DGNavigationBar';
 import DGSheetView from '../../public/DGSheetView';
 import HUD from '../../public/DGHUD';
+import Storage,{login_response_info} from '../../config/storage/DGAsyncStorage';
 
 export default class LHMyselfScreen extends Component{
     constructor(){
@@ -43,6 +44,7 @@ export default class LHMyselfScreen extends Component{
         ],
       });
       this.props.navigation.dispatch(resetAction);
+      Storage.delete({key:login_response_info});
     }
 
     // 进入用户详情页面

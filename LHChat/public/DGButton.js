@@ -1,7 +1,18 @@
 import React, { PureComponent,Component } from 'react';
-import {View,Text,TouchableOpacity,StyleSheet,Image} from 'react-native';
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    StyleSheet,
+    Image,
+    ART,
+    Animated,
+    Easing
+} from 'react-native';
 import PropTypes from 'prop-types';
 
+// 将 ART.Surface 指定为自定义动画视图（Animated 默认只封装了Image、ScrollView、View、Text 的动画属性）
+let SurfaceAnimationView = Animated.createAnimatedComponent(ART.Surface);
 
 export default class DGButton extends Component{
     constructor(){
@@ -10,8 +21,10 @@ export default class DGButton extends Component{
             justifyContent:'center',
             alignItems:'center',
             arrangeType:'imageInFront',
-            direction:'row'
+            direction:'row',
         }
+        //创建旋转动画
+        this.rotateAnimation = new Animated.Value(0);
     }
 
     /**componentWillReceiveProps 将在未来的某个版本中取消。请使用下面的 static getDerivedStateFromProps 替代 */ 
@@ -67,7 +80,53 @@ export default class DGButton extends Component{
         if(this.props.onPress)this.props.onPress(event,props);
     }
 
+    // 无限旋转动画
+    transformRotateAnimation = ()=>{
+        // 设置映射
+        let rotate = this.rotateAnimation.interpolate({
+            inputRange: [0, 1],//输入值
+            outputRange: ['0deg', '360deg'] //输出值
+        });
+        return rotate;
+    }
+
+    // 开始动画
+    startRotateAnimation = ()=>{
+        // 这里使用定时器，是因为在下面render方法中调用此函数时还没有渲染出来组件，需要使用setTimeout的特性（新的runloop），等待当前runloop运行完毕之后再执行下面的动画
+        setTimeout(() => {
+            // loop 循环动画只有一个config属性，循环次数:iterations,默认为-1 （无限循环）
+            Animated.loop(
+                Animated.timing(
+                    this.rotateAnimation,
+                    {
+                        toValue:1,
+                        duration:500,
+                        easing: Easing.linear
+                    },
+                ),
+                {iterations:-1}
+            ).start();
+        }, 0);
+    }
+
     render(){
+        if(this.props.loading){
+            // 开始动画
+            this.startRotateAnimation()
+
+            // 创建绘制路径
+            const path = ART.Path();
+            path.moveTo(20,10).arc(0,20,10);// moveTo(20,10)移动之后arc()的坐标这里就是从这里按(0,0)开始算。和iOS中的不一样。
+
+            return(
+                <View style = {this.props.style} >
+                    <SurfaceAnimationView width={40} height={40} style = {{transform: [{rotate:this.transformRotateAnimation()}]}}>
+                        <ART.Shape d={path} stroke="#000000" strokeWidth={1} />
+                    </SurfaceAnimationView>
+                </View>
+            );
+        }
+
         return(
             <TouchableOpacity style = {this.props.style} 
                               onPress = {this.donePress} 

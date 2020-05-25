@@ -5,15 +5,11 @@ import {
     StyleSheet,
     Modal,
     Image,
-    ScrollView,
     Dimensions,
-    PanResponder,
-    TouchableOpacity,
     LayoutAnimation,
     UIManager,
     Animated,
-    findNodeHandle,
-    Easing
+    findNodeHandle
 }  from 'react-native';
 
 import DGNavigationBar from 'dg-public/DGNavigationBar';
@@ -139,7 +135,7 @@ export default class DGCheckImageView extends Component{
             const handle = findNodeHandle(imageRef);
             UIManager.measureInWindow(handle,(x, y, width, height)=>{
                 this.setState((state)=>({
-                    animationOpacity:new Animated.Value(0),     // 背景黑
+                    animationOpacity:new Animated.Value(0),     // 动画开始的透明度
                     animationTop:y,
                     animationLeft:x,
                     animationWidth:width,

@@ -3,8 +3,13 @@ include ':react-native-location'
 project(':react-native-location').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-location/android')
 apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 
+// sqlite 数据存储
 include ':react-native-sqlite-storage'
 project(':react-native-sqlite-storage').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sqlite-storage/platforms/android')
+
+// 数据存储框架 realm，比较强大。可能会代替sqlite
+include ':realm'
+project(':realm').projectDir = new File(rootProject.projectDir, '../node_modules/realm/android')
 
 include ':app'
 
